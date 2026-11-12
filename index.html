@@ -4,10 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>訓練手帳</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20aria-hidden%3D%22true%22%3E%3Crect%20width%3D%2248%22%20height%3D%2248%22%20rx%3D%2212%22%20fill%3D%22%232450e6%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2221.5%22%20width%3D%2220%22%20height%3D%225%22%20rx%3D%222%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%229%22%20y%3D%2214%22%20width%3D%226%22%20height%3D%2220%22%20rx%3D%223%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%2233%22%20y%3D%2214%22%20width%3D%226%22%20height%3D%2220%22%20rx%3D%223%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%225%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23ffd0e2%22/%3E%3Crect%20x%3D%2239%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23ffd0e2%22/%3E%3Ccircle%20cx%3D%2238%22%20cy%3D%229%22%20r%3D%224%22%20fill%3D%22%23ff5c9a%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="訓練手帳">
 <meta name="description" content="記錄每日訓練、產生一週課表（含暖身、收操與部位銜接）的健身 web app">
 <style>
-:root{--bg:#f3f5f8;--sf:#fff;--fg:#16202b;--mu:#5b6878;--ln:#dde3ea;--ac:#c2410c;--acf:#fff;--soft:#fff0e6;--ok:#15803d}
-@media (prefers-color-scheme:dark){:root{--bg:#10151b;--sf:#19212b;--fg:#e8edf3;--mu:#9aa7b5;--ln:#2b3644;--ac:#ff8a4c;--acf:#1b0e05;--soft:#33210f;--ok:#4ade80;color-scheme:dark}}
+:root{--bg:#f2f4fa;--sf:#fff;--fg:#141a2b;--mu:#586079;--ln:#d9deea;--ac:#2450e6;--acf:#fff;--soft:#e6ecff;--hi:#c81e66;--ok:#12824a;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1220;--sf:#171c2e;--fg:#e9ecf7;--mu:#9aa3bd;--ln:#2a3148;--ac:#8aa6ff;--acf:#0b1330;--soft:#1f2a52;--hi:#ff7fb2;--ok:#4ade80;color-scheme:dark}}
+:root[data-theme=dark]{--bg:#0e1220;--sf:#171c2e;--fg:#e9ecf7;--mu:#9aa3bd;--ln:#2a3148;--ac:#8aa6ff;--acf:#0b1330;--soft:#1f2a52;--hi:#ff7fb2;--ok:#4ade80;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
@@ -18,7 +22,7 @@ h2{font-size:19px;margin:0}
 h3{font-size:16px;margin:0}
 p{margin:0}
 .mu{color:var(--mu)}.sm{font-size:13px}
-.eb{font-size:12px;letter-spacing:.1em;color:var(--ac);font-weight:700}
+.eb{font-size:12px;letter-spacing:.1em;color:var(--hi);font-weight:700}
 .card{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .bt{justify-content:space-between;flex-wrap:nowrap}
@@ -40,7 +44,7 @@ a{color:var(--ac)}
 ol.exs{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;counter-reset:e}
 ol.exs li{counter-increment:e;border-top:1px solid var(--ln);padding-top:10px}
 .exn{font-weight:700}.exn::before{content:counter(e) ". ";color:var(--mu)}
-.dose{color:var(--ac);font-weight:700;font-variant-numeric:tabular-nums}
+.dose{color:var(--hi);font-weight:700;font-variant-numeric:tabular-nums}
 details{border:1px dashed var(--ln);border-radius:10px;padding:8px 12px}
 details.plain{border:0;padding:0}
 summary{cursor:pointer;font-weight:700}
@@ -56,23 +60,32 @@ label.f select{color:var(--fg)}
 .stat{flex:1;min-width:90px}.stat b{display:block;font-size:26px;line-height:1.2;font-variant-numeric:tabular-nums}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--sf);border-top:1px solid var(--ln);display:flex;justify-content:center;
  padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));z-index:5}
-nav.tabs button{flex:1;max-width:160px;border:0;background:transparent;padding:10px 4px;color:var(--mu);font-weight:700;border-radius:10px}
+nav.tabs button{flex:1;max-width:160px;border:0;background:transparent;padding:6px 4px;color:var(--mu);font-weight:700;border-radius:10px;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.top{display:flex;align-items:center;gap:10px}.top svg{width:42px;height:42px;flex:none}.top b{font-size:20px;line-height:1.2;display:block}.top span{font-size:12px;color:var(--mu)}.top button{margin-left:auto;font-size:13px;white-space:nowrap}
+label.f input{color:var(--fg)}
 nav.tabs button[aria-current=page]{color:var(--ac);background:var(--soft)}
-#timer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(70px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);
+#timer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);
  border-radius:999px;padding:8px 8px 8px 18px;display:flex;gap:10px;align-items:center;font-weight:700;font-variant-numeric:tabular-nums;z-index:6;white-space:nowrap}
 #timer button{border:0;background:transparent;color:inherit;font-size:18px;padding:2px 10px}
 #toast{position:fixed;left:50%;transform:translateX(-50%);top:16px;background:var(--fg);color:var(--bg);border-radius:10px;padding:8px 16px;z-index:7;max-width:90vw}
+.fig{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.fig svg{width:190px;max-width:100%;height:auto;display:block}
+.fig img{max-width:100%;width:240px;border-radius:10px;border:1px solid var(--ln)}
+.mb{fill:var(--ln)}.m1{fill:var(--ac)}.m2{fill:var(--ac);opacity:.38}.mt{fill:var(--mu);font-size:9px}
+.form label.f input,.form label.f textarea{color:var(--fg)}
 </style>
 </head>
 <body>
 <main id="app"></main>
 <div id="timer" hidden><span id="timer-t"></span><button data-a="stoptimer" aria-label="關閉計時">×</button></div>
+<input type="file" id="img-in" accept="image/*" hidden>
 <div id="toast" hidden role="status"></div>
 <nav class="tabs" aria-label="主選單">
-  <button data-a="tab" data-v="today">今日</button>
-  <button data-a="tab" data-v="plan">計畫</button>
-  <button data-a="tab" data-v="hist">紀錄</button>
-  <button data-a="tab" data-v="lib">動作庫</button>
+  <button data-a="tab" data-v="today"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>今日</button>
+  <button data-a="tab" data-v="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>計畫</button>
+  <button data-a="tab" data-v="hist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>紀錄</button>
+  <button data-a="tab" data-v="lib"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M7 7v10M17 7v10M3 10v4M21 10v4"/></svg>動作庫</button>
 </nav>
 
 <script>
@@ -126,26 +139,79 @@ legraise:{n:'仰臥抬腿',g:'核心',e:'bw',eq:'無',p:'下腹、髖屈肌',s:'
 rower:{n:'划船機／飛輪間歇',g:'體能',e:'gym',eq:'划船機或飛輪',p:'心肺',s:'全身',k:'cond',c:'30 秒用八九成力衝刺，接 60 秒輕鬆划或踩，重複指定組數。'},
 burpee:{n:'波比跳間歇',g:'體能',e:'bw',eq:'無',p:'心肺',s:'全身',k:'cond',c:'30 秒內連續做：蹲下、雙腳後跳成伏地挺身姿勢、收腳、起跳。接 60 秒原地走動休息。'}
 };
-const SLOT={jump:['boxjump','cmj'],broad:['broad'],bound:['bound'],throw:['mbslam'],squat:['squat','goblet','bwsquat'],hinge:['rdl','dbrdl','bridge'],uni:['bss'],legpress:['legpress','lunge'],ham:['legcurl','slidecurl'],calf:['calf'],hpush:['bench','dbbench','pushup'],ipush:['incline','declinepu'],vpush:['ohp','pike'],lat:['latraise'],tri:['pushdown','ohext','closepu'],vpull:['latpull','pullup'],hpull:['row','dbrow','invrow'],rear:['facepull','revfly','ytw'],bi:['curl'],er:['extrot'],core1:['plank'],core2:['deadbug'],anti:['pallof','sideplank'],rot:['twist'],hang:['hangleg','legraise'],cond:['rower','burpee']};
+Object.assign(EX,{
+smith:{n:'史密斯機深蹲',g:'下肢',e:'gym',eq:'史密斯機',p:'股四頭、臀',s:'核心',k:'main',c:'槓在固定軌道上，不用顧平衡。腳站在槓的正下方略往前，轉動手腕解開掛勾，往下蹲到大腿約平行再站起。做完把掛勾轉回卡榫。'},
+backext:{n:'背伸展（羅馬椅）',g:'下肢',e:'gym',eq:'羅馬椅',p:'腿後、臀、下背',s:'核心',k:'acc',r:'10–15 下',c:'墊子頂在髖骨下方，腳跟勾住。背打直往下折到約 90 度，再用臀與腿後把身體帶回成一直線，不要過度後仰。'},
+stepup:{n:'登階',g:'下肢',e:'bw',eq:'穩固的椅子或跳箱（可手持啞鈴）',p:'股四頭、臀',s:'小腿、核心',k:'acc',side:1,c:'一腳整個腳掌踩上箱子，用上面那隻腳發力站直，下面的腳不要蹬地，再慢慢下來。'},
+chestpress:{n:'坐姿推胸機',g:'胸',e:'gym',eq:'推胸機',p:'胸',s:'三頭、前三角',k:'main',c:'調整座椅讓把手對齊胸部中線，背貼緊椅背。往前推到手臂接近伸直、不鎖死手肘，再慢慢放回到胸口有伸展感。'},
+shoulderpress:{n:'肩推機',g:'肩',e:'gym',eq:'肩推機',p:'前、中三角',s:'三頭、上斜方',k:'main',c:'調整座椅讓把手在肩膀高度，背貼緊椅背。往上推到手臂接近伸直，再慢慢放回耳朵高度。'},
+cablelat:{n:'滑輪側平舉',g:'肩',e:'gym',eq:'滑輪機、單手把手',p:'中三角',s:'上斜方',k:'iso',side:1,c:'滑輪調到最低，側對機器，用外側的手握把。手肘微彎往側邊抬到與肩同高，慢慢放下。'},
+revpec:{n:'蝴蝶機反向飛鳥',g:'肩',e:'gym',eq:'蝴蝶機（把手調到最後方）',p:'後三角',s:'菱形肌、中斜方',k:'acc',r:'12–15 下',c:'面向椅背坐，胸口貼墊。手臂微彎往兩側打開到與肩成一直線，夾肩胛後慢放。'},
+assistpull:{n:'輔助引體向上機',g:'背',e:'gym',eq:'輔助引體向上機',p:'背闊肌',s:'二頭、後三角',k:'main',c:'先選配重，配重越重輔助越多、越輕鬆。膝蓋跪上墊子，先沉肩再把胸口拉向握把，慢慢放回到手臂伸直。下機時先一腳踩回踏階。'},
+cablecurl:{n:'滑輪彎舉',g:'二頭',e:'gym',eq:'滑輪機、直桿',p:'二頭',s:'前臂',k:'iso',c:'滑輪調到最低。上臂貼著身體不動，把桿子彎舉到肩前，慢慢放回到手臂伸直。'},
+hammer:{n:'啞鈴錘式彎舉',g:'二頭',e:'db',eq:'啞鈴',p:'二頭、前臂',s:'握力',k:'iso',c:'掌心相對握啞鈴，上臂不動，彎舉到肩前再慢放。'},
+latlunge:{n:'側弓箭步',g:'下肢',e:'bw',eq:'無（可手持啞鈴）',p:'股四頭、臀',s:'大腿內側、核心',k:'acc',side:1,easy:1,c:'往側邊跨一大步，跨出腳屈膝、臀往後坐，另一腳伸直、腳掌貼地。用跨出腳推回原位。'},
+farmer:{n:'農夫走路',g:'握力',e:'db',eq:'一對啞鈴或壺鈴',p:'握力、前臂',s:'上斜方、核心',k:'acc',r:'走 30 秒',c:'雙手各提一個重物，肩膀下沉、身體站直，小步穩定往前走，身體不要左右晃。'},
+deadhang:{n:'單槓懸吊',g:'握力',e:'bw',eq:'單槓',p:'握力、前臂',s:'背闊、肩',k:'acc',r:'20–30 秒',easy:1,c:'正握單槓、手臂伸直懸吊，肩膀微微下沉，不要完全放鬆聳肩。'},
+wristcurl:{n:'啞鈴腕彎舉',g:'握力',e:'db',eq:'輕啞鈴',p:'前臂',s:'握力',k:'iso',r:'15 下',c:'前臂放在大腿或椅面上、手腕懸空，掌心朝上，只動手腕把啞鈴捲起再慢放。做完換掌心朝下再做一輪。'},
+towel:{n:'擰毛巾',g:'握力',e:'bw',eq:'毛巾',p:'前臂、握力',s:'手腕',k:'iso',r:'30 秒',easy:1,c:'雙手握緊捲起的毛巾，像擰乾一樣用力往相反方向轉，每 5 秒換方向。'},
+woodchop:{n:'滑輪伐木',g:'核心',e:'gym',eq:'滑輪機',p:'腹斜肌（旋轉）',s:'肩、臀',k:'core',side:1,r:'10 下',c:'側對滑輪，滑輪調到高位。雙手握把，用軀幹旋轉把把手從肩上斜拉到對側髖部，手臂保持微彎，再慢慢回去。'},
+birddog:{n:'鳥狗式',g:'核心',e:'bw',eq:'無',p:'深層核心、下背',s:'臀、肩',k:'core',r:'每邊 8–10 下',c:'四足跪姿，對側手腳同時伸直到與身體同高，停 2 秒再收回。骨盆不要左右晃。'}
+});
+['smith','backext','stepup','chestpress','shoulderpress','revpec','assistpull','cablecurl','birddog','goblet','legpress','legcurl','latpull','row','plank','deadbug','cmj','bridge','facepull','pushdown','dbbench'].forEach(k=>EX[k].easy=1);
+const SLOT={jump:['boxjump','cmj'],broad:['broad'],bound:['bound'],throw:['mbslam'],squat:['squat','goblet','bwsquat','smith'],hinge:['rdl','dbrdl','bridge','backext'],uni:['bss','stepup'],legpress:['legpress','lunge'],ham:['legcurl','slidecurl'],calf:['calf'],hpush:['bench','dbbench','pushup','chestpress'],ipush:['incline','declinepu'],vpush:['ohp','pike','shoulderpress'],lat:['latraise','cablelat'],tri:['pushdown','ohext','closepu'],vpull:['latpull','pullup','assistpull'],hpull:['row','dbrow','invrow'],rear:['facepull','revfly','ytw','revpec'],bi:['curl','cablecurl','hammer'],er:['extrot'],core1:['plank'],core2:['deadbug','birddog'],anti:['pallof','sideplank'],rot:['twist','woodchop'],grip:['farmer','deadhang'],wrist:['wristcurl','towel'],latlunge:['latlunge'],hang:['hangleg','legraise'],cond:['rower','burpee']};
+/* 替代動作：同類型優先，其次是相近類型 */
+const XALT={squat:['legpress','uni'],legpress:['squat','uni'],uni:['legpress'],hinge:['ham'],ham:['hinge'],jump:['broad'],broad:['jump'],bound:['broad','jump'],throw:['rot'],ipush:['hpush'],er:['rear'],core1:['core2','anti'],core2:['core1'],anti:['core1','rot'],rot:['anti'],hang:['core2','rot'],latlunge:['uni','legpress'],grip:['wrist'],wrist:['grip']};
+function alts(id){
+  const ex=EX[id];if(!ex)return [];
+  const sl=Object.keys(SLOT).filter(k=>SLOT[k].includes(id)),all=[];
+  if(ex.custom&&ex.slot)sl.push(ex.slot);
+  const add=k=>Object.keys(st.custom).filter(x=>st.custom[x].slot===k).concat(SLOT[k]).forEach(x=>{if(x!==id&&!all.includes(x)&&EX[x]&&okEq(EX[x]))all.push(x)});
+  sl.forEach(add);sl.forEach(k=>(XALT[k]||[]).forEach(add));
+  return all;
+}
+function lighten(l){
+  l.items.forEach(it=>{const n=it.sets.length,t=it.id&&EX[it.id]&&EX[it.id].k==='cond'?Math.max(3,n-2):Math.max(2,n-1);
+    while(it.sets.length>t){const x=it.sets[it.sets.length-1];if(x.r||x.d)break;it.sets.pop()}
+    if(it.dose)it.dose=it.dose.replace(/^\d+/,it.sets.length)});
+  l.light=true;if(l.title&&!/輕量/.test(l.title))l.title+='（輕量）';
+}
 /* 課表：m 當天主要負擔部位（用來避免連兩天練到同部位） */
 const SES={
-LP:{t:'下肢力量＋跳躍',m:['腿'],w:'leg',note:'跳躍排在最前面，趁神經系統最新鮮時做。深蹲時臀與核心是協同肌，所以主項之後接單腳、小腿與核心補強，不再排第二個大重量臀腿動作。',slots:['jump','squat','hinge','uni','calf','core1']},
-LB:{t:'後側鏈＋橫向爆發',m:['腿'],w:'leg',note:'這天以腿後與臀為主。硬舉類動作下背是協同肌，所以核心選抗旋轉動作，不再加重下背負擔。',slots:['broad','bound','hinge','legpress','ham','anti']},
+LP:{t:'下肢力量＋跳躍',t2:'下肢力量',cut:1,m:['腿'],w:'leg',note:'跳躍排在最前面，趁神經系統最新鮮時做。深蹲時臀與核心是協同肌，所以主項之後接單腳、小腿與核心補強，不再排第二個大重量臀腿動作。',slots:['jump','squat','hinge','uni','calf','core1']},
+LB:{t:'後側鏈＋橫向爆發',t2:'後側鏈',m:['腿'],w:'leg',note:'這天以腿後與臀為主。硬舉類動作下背是協同肌，所以核心選抗旋轉動作，不再加重下背負擔。',slots:['broad','bound','hinge','legpress','ham','anti']},
 PUSH:{t:'推：胸・肩・三頭',m:['胸','肩','三頭'],w:'push',note:'臥推與肩推都靠三頭肌協同出力，所以三頭的孤立動作排在最後，同一天練完。隔天不再安排推的動作，讓三頭恢復。',slots:['hpush','vpush','ipush:acc','lat','tri','er']},
 PULL:{t:'拉：背・二頭・後三角',m:['背','二頭'],w:'pull',note:'下拉與划船時二頭肌、後三角是協同肌，所以背部主項之後接後三角與二頭，同一天練完。二頭先練會讓背的主項拉不動，所以順序不能反過來。',slots:['vpull','hpull','rear','bi','hang']},
 UP:{t:'上肢綜合：推拉配對',m:['胸','背','肩','三頭','二頭'],w:'push',note:'一推一拉交替，胸和背互為拮抗肌，可以互相休息。手臂在推拉主項中都已出力，最後各補一個孤立動作即可。',slots:['hpush','hpull','vpush:acc','vpull:acc','tri','bi','er']},
 FBA:{t:'全身 A：蹲＋水平推拉',m:['腿','胸','背'],w:'full',note:'一天涵蓋下肢、推、拉三個動作型態。先做下肢再做上肢，推拉交替讓協同的手臂肌群輪流休息。',slots:['jump','squat','hpush','hpull','ham','core1']},
 FBB:{t:'全身 B：髖伸＋垂直推拉',m:['腿','肩','背'],w:'full',note:'與全身 A 互補：下肢改練後側鏈，上肢改練垂直方向的推與拉，同一肌群一週刺激兩次但角度不同。',slots:['broad','hinge','vpush','vpull','uni','anti']},
 SH:{t:'肩部穩定＋核心旋轉',m:['肩'],w:'push',note:'負擔較輕的一天。扣球與發球靠軀幹旋轉把力量傳到手臂，所以練核心旋轉、後三角與肩外旋，重量都偏輕。',slots:['throw','rear','er','lat','rot','anti','core2']},
+LAT:{t:'下肢橫移＋後側鏈',m:['腿'],w:'leg',note:'救球靠側向弓箭步與單腳煞停，所以先練側向跳與側弓箭步，再補腿後與小腿。抗旋轉核心讓上身在急停時不被甩出去。',slots:['bound','latlunge','hinge','ham','calf','anti']},
+PREC:{t:'上肢穩定＋握力',m:['肩','背'],w:'pull',note:'出手要穩，靠的是肩胛與肩外旋肌把手臂固定住，所以先練划船與後三角，再練握力與前臂。握力放最後，否則前面的拉動作會握不住。',slots:['hpull:acc','rear','er','grip','wrist','anti','core2']},
+ROT:{t:'下肢支撐＋核心旋轉',m:['腿'],w:'leg',note:'站姿與出手的力量從腳傳到軀幹再到手。先練單腳與髖伸讓下盤穩，再練核心旋轉與抗旋轉，重量中等即可。',slots:['uni','hinge:acc','latlunge','rot','anti','core1']},
 COND:{t:'體能間歇＋核心',m:[],w:'full',note:'這天不加重肌肉負擔，用間歇提升心肺與熱量消耗，再補核心。',slots:['cond','core1','core2','rot']}
 };
-const PLANS={
-vb:{2:['FBA','FBB'],3:['LP','UP','LB'],4:['LP','PUSH','LB','PULL'],5:['LP','PUSH','LB','PULL','SH']},
-bb:{2:['FBA','FBB'],3:['LP','UP','LB'],4:['LP','PUSH','LB','PULL'],5:['LP','PUSH','LB','PULL','SH']},
-mass:{2:['FBA','FBB'],3:['PUSH','PULL','LP'],4:['PUSH','PULL','LP','UP'],5:['PUSH','PULL','LP','UP','LB']},
-fat:{2:['FBA','FBB'],3:['FBA','COND','FBB'],4:['LP','PUSH','PULL','COND'],5:['LP','PUSH','LB','PULL','COND']}
+const PL={
+jump:{l:'跳躍爆發型（排球、籃球類）',st:'sport',pw:1,sp:1,plans:{2:['FBA','FBB'],3:['LP','UP','LB'],4:['LP','PUSH','LB','PULL'],5:['LP','PUSH','LB','PULL','SH']}},
+racket:{l:'橫移揮拍型（羽球、匹克球、網球類）',st:'sport',pw:1,sp:1,plans:{2:['FBA','FBB'],3:['LP','UP','LAT'],4:['LP','PUSH','LAT','PULL'],5:['LP','PUSH','LAT','PULL','SH']}},
+swim:{l:'划水耐力型（游泳類）',st:'gen',pw:0,sp:1,plans:{2:['FBA','FBB'],3:['PULL','LP','SH'],4:['PULL','LP','PUSH','SH'],5:['PULL','LP','PUSH','LB','SH']}},
+skill:{l:'穩定精準型（保齡球、飛鏢、撞球類）',st:'gen',pw:0,sp:1,plans:{2:['ROT','PREC'],3:['ROT','PREC','FBA'],4:['ROT','PREC','FBA','COND'],5:['ROT','PUSH','PREC','PULL','COND']}},
+mass:{l:'增肌型',st:'mass',pw:0,sp:0,plans:{2:['FBA','FBB'],3:['PUSH','PULL','LP'],4:['PUSH','PULL','LP','UP'],5:['PUSH','PULL','LP','UP','LB']}},
+fat:{l:'減脂體能型',st:'fat',pw:0,sp:0,plans:{2:['FBA','FBB'],3:['FBA','COND','FBB'],4:['LP','PUSH','PULL','COND'],5:['LP','PUSH','LB','PULL','COND']}}
 };
-const GOALS={vb:'排球專項',bb:'籃球專項',mass:'增肌',fat:'減脂／體能'};
+const GOALS={
+vb:{n:'排球',pl:'jump',tip:'重點在垂直起跳、落地緩衝與扣球的肩膀。'},
+bb:{n:'籃球',pl:'jump',tip:'重點在起跳、變向與落地時的膝蓋穩定。'},
+bad:{n:'羽毛球',pl:'racket',tip:'重點在弓箭步救球、殺球後的單腳落地，以及過頭揮拍的肩膀與前臂。'},
+pk:{n:'匹克球',pl:'racket',tip:'重點在短距離橫移、低重心截擊，以及手腕和肩膀的耐受度。'},
+swim:{n:'游泳',pl:'swim',tip:'重點在背闊與肩膀的划水力量、肩關節穩定，以及讓身體保持流線的核心。重量訓練建議排在下水之後或不同天。'},
+bowl:{n:'保齡球',pl:'skill',tip:'重點在滑步時的單腳支撐、握力與軀幹旋轉。'},
+dart:{n:'射飛鏢',pl:'skill',tip:'重量訓練對準度的直接幫助有限。課表以久站不晃的下盤、肩膀穩定與前臂耐力為主。'},
+pool:{n:'撞球',pl:'skill',tip:'重量訓練對準度的直接幫助有限。課表以長時間俯身需要的臀腿與下背耐力、肩膀穩定為主。'},
+bey:{n:'戰鬥陀螺',pl:'skill',tip:'發射靠握力、前臂與軀幹旋轉的瞬間出力，課表以這三塊加上肩膀穩定為主。'},
+mass:{n:'增肌',pl:'mass'},
+fat:{n:'減脂／體能',pl:'fat'}
+};
 const LEVELS=['初學（訓練未滿半年）','中階（半年到兩年）','進階（兩年以上）'];
 const ENVS={gym:'健身房（器械、槓鈴、啞鈴）',db:'居家啞鈴',bw:'徒手'};
 const SUGGEST=[[0,2,4],[0,1,3,4],[0,1,2,4,5]];
@@ -154,20 +220,22 @@ leg:['輕鬆有氧 5 分鐘（慢跑、飛輪或跳繩）','髖關節繞環，�
 push:['輕鬆有氧 5 分鐘','手臂前後繞環各 10 下','貓牛式 8 下、胸椎旋轉每邊 6 下','彈力帶拉開（或俯臥 T 字上抬）15 下','伏地挺身 8 下','第一個主項先做 2 組暖身組（約正式重量的 50%、70%）'],
 pull:['輕鬆有氧 5 分鐘','貓牛式 8 下、胸椎旋轉每邊 6 下','單槓懸吊 20 秒（或嬰兒式伸展）','肩胛後收下壓 10 下（手臂伸直，只動肩胛）','第一個主項先做 2 組暖身組（約正式重量的 50%、70%）'],
 full:['輕鬆有氧 5 分鐘','世界最偉大伸展，每邊 5 下','手臂繞環各 10 下、貓牛式 8 下','徒手深蹲 10 下、伏地挺身 8 下','第一個主項先做 2 組暖身組（約正式重量的 50%、70%）']};
-const WARMX={vb:['落地練習：踮腳後快速下蹲停住 5 下，膝蓋不內夾','肩外旋 12 下，喚醒旋轉肌袖'],bb:['落地練習：踮腳後快速下蹲停住 5 下，膝蓋不內夾','側向滑步每邊 10 公尺']};
+const WARMX={jump:['落地練習：踮腳後快速下蹲停住 5 下，膝蓋不內夾','肩外旋 12 下，喚醒旋轉肌袖'],racket:['落地練習：踮腳後快速下蹲停住 5 下，膝蓋不內夾','側向滑步每邊 10 公尺','手腕繞環各 10 下'],swim:['手臂大繞環前後各 15 下','彈力帶拉開（或俯臥 T 字上抬）15 下'],skill:['手腕繞環與前臂伸展，每邊 20 秒','胸椎旋轉每邊 8 下']};
 const COOL={
 leg:['慢走 3–5 分鐘讓心跳降下來','股四頭伸展，每邊 30 秒','腿後伸展，每邊 30 秒','臀部鴿式伸展，每邊 30 秒','髖屈肌弓步伸展，每邊 30 秒','小腿伸展，每邊 30 秒'],
 push:['慢走 3 分鐘','門框胸部伸展，每邊 30 秒','過頭三頭伸展，每邊 30 秒','手臂橫胸肩後側伸展，每邊 30 秒','嬰兒式 45 秒'],
 pull:['慢走 3 分鐘','嬰兒式側向延伸（背闊），每邊 30 秒','二頭與前臂伸展，每邊 30 秒','上斜方（頸側）伸展，每邊 30 秒','胸椎旋轉每邊 6 下'],
 full:['慢走 3–5 分鐘','股四頭與腿後伸展，每邊各 30 秒','臀部鴿式伸展，每邊 30 秒','門框胸部伸展，每邊 30 秒','嬰兒式 45 秒']};
 const WD=['一','二','三','四','五','六','日'];
-const GROUPS=['下肢','爆發','胸','肩','三頭','背','二頭','核心','體能'];
+const GROUPS=['下肢','爆發','胸','肩','三頭','背','二頭','握力','核心','體能'];
 
 /* ---------- 狀態 ---------- */
 const KEY='training-notebook-v1';
-let st={set:{goal:'vb',lv:1,env:'gym',days:[0,1,3,4],ball:[]},plan:null,logs:{}};
+let st={set:{goal:'vb',lv:1,env:'gym',days:[0,1,3,4],ball:[],mins:''},plan:null,logs:{},custom:{},imgs:{},goals:{},favs:[],theme:'',unit:'kg'};
 try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&typeof r.logs==='object')st=Object.assign(st,r)}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){toast('這個瀏覽器無法儲存資料')}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));return true}catch(e){toast('儲存失敗：空間不足或瀏覽器不允許儲存');return false}};
+function sync(){for(const k in EX)if(EX[k].custom)delete EX[k];st.custom=st.custom||{};st.imgs=st.imgs||{};st.goals=st.goals||{};st.favs=st.favs||[];if(st.theme)document.documentElement.dataset.theme=st.theme;else delete document.documentElement.dataset.theme;Object.assign(EX,st.custom)}
+sync();
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -175,45 +243,60 @@ const today=()=>fmt(new Date());
 const parse=s=>new Date(s+'T00:00:00');
 const wd=s=>(parse(s).getDay()+6)%7;
 const nice=s=>{const d=parse(s);return (d.getMonth()+1)+'月'+d.getDate()+'日 週'+WD[wd(s)]};
-const isSport=g=>g==='vb'||g==='bb';
-let tab='today',cur=today(),q='',delAsk=null,tm=null,left=0,toastT=null;
+const goalOf=id=>GOALS[id]||(st.goals&&st.goals[id])||GOALS.vb,plOf=id=>PL[goalOf(id).pl]||PL.jump,isSport=g=>!!plOf(g).sp;
+let tab='today',cur=today(),q='',delAsk=null,tm=null,left=0,toastT=null,swapAt=null,form=null,openEx=null,imgFor=null;
 
 function toast(t){const b=$('#toast');b.textContent=t;b.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>b.hidden=true,2600)}
 
 /* ---------- 課表產生 ---------- */
 const okEq=ex=>st.set.env==='gym'||(ex.e!=='gym'&&(st.set.env==='db'||ex.e==='bw'));
 function dose(ty,ex){
-  const g=st.set.goal,lv=+st.set.lv;let d;
+  const sty=plOf(st.set.goal).st,lv=+st.set.lv;let d;
   if(ty==='power')d={sets:3,reps:'5 下',rest:120};
-  else if(ty==='main')d=isSport(g)?{sets:4,reps:'5–6 下',rest:150}:g==='mass'?{sets:4,reps:'8–10 下',rest:120}:{sets:3,reps:'12 下',rest:75};
-  else if(ty==='acc')d=g==='fat'?{sets:3,reps:'12–15 下',rest:60}:{sets:3,reps:'8–12 下',rest:90};
+  else if(ty==='main')d=sty==='sport'?{sets:4,reps:'5–6 下',rest:150}:sty==='mass'?{sets:4,reps:'8–10 下',rest:120}:sty==='gen'?{sets:3,reps:'8–10 下',rest:90}:{sets:3,reps:'12 下',rest:60};
+  else if(ty==='acc')d=sty==='fat'?{sets:3,reps:'12–15 下',rest:60}:{sets:3,reps:'8–12 下',rest:90};
   else if(ty==='iso')d={sets:3,reps:'12–15 下',rest:60};
-  else if(ty==='pre')d={sets:2,reps:'12–15 下',rest:45};
-  else if(ty==='core')d={sets:3,reps:'10–12 下',rest:45};
+  else if(ty==='pre')d={sets:2,reps:'12–15 下',rest:30};
+  else if(ty==='core')d={sets:3,reps:'10–12 下',rest:30};
   else d={sets:6,reps:'30 秒',rest:60};
   if(ex.e==='bw'&&(ty==='main'||ty==='acc')&&!ex.r){d.reps='10–15 下';d.rest=90}
   if(ex.r)d.reps=ex.r;
   if(ex.side&&!/每邊/.test(d.reps))d.reps+='（每邊）';
   if(lv===0&&d.sets>2&&ty!=='cond')d.sets--;
   if(lv===2&&(ty==='main'||ty==='acc'))d.sets++;
+  if(ex.sets)d.sets=ex.sets;
+  if(ex.rest)d.rest=ex.rest;
   return d;
+}
+/* 時間估算：暖身 10 + 收操 8 分鐘，每組約 40 秒加休息，換項目 1 分鐘 */
+const estRaw=items=>18+items.reduce((a,it)=>a+it.sets*((it.ty==='cond'?30:40)+it.rest)/60+1,0);
+const est=items=>Math.max(5,Math.round(estRaw(items)/5)*5);
+function fit(items,B,noGrow){
+  const over=()=>estRaw(items)>B,
+  cut=(ts,m)=>{for(const it of items){if(!over())return;if(ts.includes(it.ty)&&it.sets>m)it.sets=m}},
+  drop=ts=>{for(let i=items.length-1;i>=0;i--){if(!over()||items.length<=2)return;if(ts.includes(items[i].ty))items.splice(i,1)}};
+  cut(['pre','iso','core','acc'],2);drop(['pre','iso']);cut(['main','power','cond'],3);drop(['core','acc']);cut(['main','power','cond'],2);
+  while(over()&&items.length>2)items.pop();
+  if(!noGrow)for(const t of ['main','acc'])for(const it of items)if(it.ty===t&&it.sets<6){it.sets++;if(over()){it.sets--;return}}
 }
 function build(k){
   const S=SES[k],items=[];
   for(const sl of S.slots){
-    const [name,ov]=sl.split(':'),id=SLOT[name].find(x=>okEq(EX[x]));
+    const [name,ov]=sl.split(':'),id=Object.keys(st.custom).filter(x=>st.custom[x].slot===name).concat(SLOT[name]).find(x=>okEq(EX[x]));
     if(!id)continue;
     const ex=EX[id],ty=ov||ex.k;
-    if(ty==='power'&&!isSport(st.set.goal))continue;
-    items.push(Object.assign({id},dose(ty,ex)));
+    if(ty==='power'&&!plOf(st.set.goal).pw)continue;
+    items.push(Object.assign({id,ty},dose(ty,ex)));
   }
-  return {k,t:S.t,note:S.note,items};
+  const B=parseInt(st.set.mins)||0;if(B)fit(items,B);
+  const pw=plOf(st.set.goal).pw;
+  return {k,t:!pw&&S.t2?S.t2:S.t,note:!pw&&S.cut?S.note.replace(/^[^。]*。/,''):S.note,items,min:est(items),tight:B&&estRaw(items)>B+2?1:0};
 }
 const perms=a=>a.length<2?[a]:a.flatMap((x,i)=>perms(a.filter((_,j)=>j!==i)).map(p=>[x,...p]));
 function gen(){
   const s=st.set,days=[...s.days].sort((a,b)=>a-b),n=days.length;
   if(n<2||n>5){toast('請選 2 到 5 個訓練日');return}
-  const keys=PLANS[s.goal][n],ball=isSport(s.goal)?s.ball:[];
+  const keys=plOf(s.goal).plans[n],ball=isSport(s.goal)?s.ball:[];
   let best=null,bc=1e9;
   for(const p of perms(keys.map((_,i)=>i))){
     let c=0;
@@ -230,15 +313,30 @@ function gen(){
 }
 
 /* ---------- 共用畫面片段 ---------- */
-const links=ex=>`<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.n+' 教學 正確姿勢')}" target="_blank" rel="noopener">教學影片</a>　<a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.n+' 動作 圖解')}" target="_blank" rel="noopener">動作圖解</a>`;
+const links=ex=>`${ex.url&&/^https?:\/\//.test(ex.url)?`<a href="${esc(ex.url)}" target="_blank" rel="noopener">我的連結</a>　`:''}<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(ex.n+' 教學 正確姿勢')}" target="_blank" rel="noopener">教學影片</a>　<a href="https://www.google.com/search?tbm=isch&q=${encodeURIComponent(ex.n+' 動作 圖解')}" target="_blank" rel="noopener">動作圖解</a>`;
 const rout=(t,a)=>`<details><summary>${t}</summary><ul>${a.map(x=>'<li>'+x+'</li>').join('')}</ul></details>`;
+/* 肌群示意圖：依「主要／協同」文字自動標色 */
+const BASE=[[40,4,20,20,10],[46,22,8,8,2],[30,28,40,62,10],[17,28,13,38,6],[70,28,13,38,6],[15,62,11,36,5],[74,62,11,36,5],[31,88,18,52,8],[51,88,18,52,8],[33,138,13,46,6],[54,138,13,46,6]];
+const SHP={delt:[[17,27,13,14,6],[70,27,13,14,6]],chest:[[32,32,17,16,5],[51,32,17,16,5]],bicep:[[18,43,10,20,4],[72,43,10,20,4]],forearm:[[16,66,9,26,4],[75,66,9,26,4]],abs:[[42,50,16,36,5]],obl:[[32,52,8,30,4],[60,52,8,30,4]],quad:[[32,93,15,42,7],[53,93,15,42,7]],
+rdelt:[[17,27,13,14,6],[70,27,13,14,6]],trap:[[40,28,20,20,6]],lat:[[31,49,13,24,6],[56,49,13,24,6]],tri:[[18,43,10,20,4],[72,43,10,20,4]],lowback:[[43,71,14,15,4]],glute:[[32,88,17,18,8],[51,88,17,18,8]],ham:[[33,108,14,29,6],[53,108,14,29,6]],calf:[[34,141,11,30,5],[55,141,11,30,5]]};
+const VIEW={delt:'f',chest:'f',bicep:'f',abs:'f',obl:'f',quad:'f',forearm:'fb',rdelt:'b',trap:'b',lat:'b',tri:'b',lowback:'b',glute:'b',ham:'b',calf:'b'};
+const MRE=[['chest',/胸/],['delt',/前三角|中三角|肩(?!胛|外旋)/],['rdelt',/後三角|肩外旋|旋轉肌|肩胛/],['tri',/三頭/],['bicep',/二頭/],['forearm',/前臂|握力/],['lat',/(^|[^下])背/],['trap',/斜方|菱形|肩胛|中背/],['lowback',/下背/],['abs',/腹|核心/],['obl',/腹斜|抗旋轉/],['glute',/臀/],['quad',/股四頭|臀腿|腿部|大腿/],['ham',/腿後/],['calf',/小腿|踝/]];
+function regs(t){t=t||'';return /全身/.test(t)?Object.keys(SHP):MRE.filter(m=>m[1].test(t)).map(m=>m[0])}
+const rc=(a,c)=>a.map(s=>`<rect class="${c}" x="${s[0]}" y="${s[1]}" width="${s[2]}" height="${s[3]}" rx="${s[4]}"/>`).join('');
+function muscleSVG(ex){
+  const p=regs(ex.p),s=regs(ex.s).filter(x=>!p.includes(x));
+  const view=v=>rc(BASE,'mb')+s.filter(k=>VIEW[k].includes(v)).map(k=>rc(SHP[k],'m2')).join('')+p.filter(k=>VIEW[k].includes(v)).map(k=>rc(SHP[k],'m1')).join('');
+  return `<svg viewBox="0 0 220 200" role="img" aria-label="肌群示意圖：主要 ${esc(ex.p)}，協同 ${esc(ex.s)}"><g transform="translate(5,0)">${view('f')}</g><g transform="translate(115,0)">${view('b')}</g><text class="mt" x="55" y="197" text-anchor="middle">正面</text><text class="mt" x="165" y="197" text-anchor="middle">背面</text></svg>`;
+}
+function fig(ex,id){const im=st.imgs[id];
+  return `<div class="fig"><div>${muscleSVG(ex)}<div class="mu sm">深色：主要肌群　淺色：協同肌群</div></div>${im&&/^data:image\//.test(im)?`<img src="${esc(im)}" alt="${esc(ex.n)} 的圖片">`:''}</div>`}
 function sesHTML(p){
   const S=SES[p.k],g=st.plan.goal;
-  return `<p class="mu sm">${p.note}</p>${rout('暖身・約 10 分鐘',WARM[S.w].concat(WARMX[g]||[]))}
-  <ol class="exs">${p.items.map(it=>{const ex=EX[it.id];return `<li><div class="exn">${ex.n}</div>
-    <div class="dose">${it.sets} 組 × ${it.reps}・組間休息 ${it.rest} 秒</div>
-    <div class="mu sm">主要：${ex.p}｜協同：${ex.s}</div>
-    <details class="plain sm"><summary>怎麼做</summary><p>器材：${ex.eq}</p><p>${ex.c}</p><p>${links(ex)}</p></details></li>`}).join('')}</ol>
+  return `<div class="row"><span class="tag">預估 ${p.min||est(p.items)} 分鐘</span>${p.tight?'<span class="mu sm">已縮到最精簡，仍會超過設定的時間</span>':''}</div><p class="mu sm">${p.note}</p>${rout('暖身・約 10 分鐘',WARM[S.w].concat(WARMX[goalOf(g).pl]||[]))}
+  <ol class="exs">${p.items.filter(it=>EX[it.id]).map(it=>{const ex=EX[it.id];return `<li><div class="exn">${esc(ex.n)}</div>
+    <div class="dose">${it.sets} 組 × ${esc(it.reps)}・組間休息 ${it.rest} 秒</div>
+    <div class="mu sm">主要：${esc(ex.p)}｜協同：${esc(ex.s)}</div>
+    <details class="plain sm"><summary>怎麼做・示意圖</summary><div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${fig(ex,it.id)}<p>器材：${esc(ex.eq)}</p><p>${esc(ex.c)}</p><p>${links(ex)}</p></div></details></li>`}).join('')}</ol>
   ${rout('收操・約 8 分鐘',COOL[S.w])}`;
 }
 
@@ -246,27 +344,31 @@ function sesHTML(p){
 function lastRec(name){
   const ds=Object.keys(st.logs).filter(d=>d<cur).sort().reverse();
   for(const d of ds){const it=st.logs[d].items.find(x=>x.name===name);
-    if(it){const a=it.sets.filter(s=>s.r).map(s=>(s.w?s.w+'kg×':'')+s.r);if(a.length){const x=parse(d);return '上次（'+(x.getMonth()+1)+'/'+x.getDate()+'）：'+a.join('、')}}}
+    if(it){const a=it.sets.filter(s=>s.r).map(s=>(s.w?s.w+(it.u||'kg')+'×':'')+s.r);if(a.length){const x=parse(d);return '上次（'+(x.getMonth()+1)+'/'+x.getDate()+'）：'+a.join('、')}}}
   return '還沒有上次紀錄';
 }
 function vToday(){
   const w=wd(cur),p=st.plan&&st.plan.days[w],log=st.logs[cur],has=log&&log.items.length;
   let h=`<div class="row nav bt"><button data-a="day" data-v="-1" aria-label="前一天">‹</button><input type="date" id="cur-date" value="${cur}" aria-label="日期"><button data-a="day" data-v="1" aria-label="後一天">›</button></div>
   <h1>${nice(cur)}${cur===today()?'・今天':''}</h1>`;
-  if(p)h+=`<section class="card"><div class="eb">當日課表</div><h2>${p.t}</h2>${sesHTML(p)}${has?'':'<button class="pri" data-a="load">開始訓練：把這些項目加入紀錄</button>'}</section>`;
-  else if(st.plan)h+=`<section class="card"><div class="eb">當日課表</div><h2>${st.plan.ball.includes(w)?'打球／專項練習日':'休息日'}</h2><p class="mu sm">今天沒有排重量訓練。如果有做其他運動，可以在下面自行新增紀錄。</p></section>`;
+  if(p)h+=`<section class="card"><div class="eb">當日課表</div><h2>${p.t}</h2>${sesHTML(p)}${has?'':'<button class="pri" data-a="load">開始訓練：把這些項目加入紀錄</button><button data-a="load" data-v="light">今天比較累：用輕量版開始</button><div class="row"><input type="text" inputmode="numeric" id="today-mins" placeholder="今天只有幾分鐘？" style="flex:1" aria-label="今天可用的分鐘數"><button data-a="load" data-v="fit">依時間精簡後開始</button></div>'}</section>`;
+  else if(st.plan)h+=`<section class="card"><div class="eb">當日課表</div><h2>${st.plan.ball.includes(w)?'專項練習日':'休息日'}</h2><p class="mu sm">今天沒有排重量訓練。如果有做其他運動，可以在下面自行新增紀錄。</p></section>`;
   else h+=`<section class="card"><h2>還沒有課表</h2><p class="mu sm">到「計畫」選目標與訓練日，就會排出一週課表。也可以直接在下面記錄今天做了什麼。</p><button class="pri" data-a="tab" data-v="plan">去排課表</button></section>`;
   h+=`<h2>訓練紀錄</h2>`;
+  if(has&&log.light)h+=`<section class="card"><div class="eb">輕量版</div><p class="sm">每個項目少一組，重量降到平常的八成左右，每組做完還有 3–4 下餘力就停；跳躍類求輕快、不求高度。想換成比較好上手的動作，按項目下方的「換動作」。如果是關節痛、頭暈或生病，請直接休息。</p></section>`;
+  else if(has&&log.title)h+=`<div class="row"><button data-a="lighten">今天比較累：改成輕量版</button></div>`;
   if(has)h+=log.items.map((it,i)=>`<section class="card"><div class="row bt"><h3>${esc(it.name)}</h3><button class="x" data-a="rmitem" data-i="${i}" aria-label="移除 ${esc(it.name)}">×</button></div>
     <p class="mu sm">${it.dose?'建議 '+esc(it.dose)+'・':''}${esc(lastRec(it.name))}</p>
     <div class="sets">${it.sets.map((s,j)=>`<div class="set"><span class="n">${j+1}</span>
-      <input inputmode="decimal" placeholder="公斤" value="${esc(s.w)}" data-f="w" data-i="${i}" data-s="${j}" id="w-${i}-${j}" aria-label="第 ${j+1} 組重量">
+      <input inputmode="decimal" placeholder="${it.u==='lb'?'磅':'公斤'}" value="${esc(s.w)}" data-f="w" data-i="${i}" data-s="${j}" id="w-${i}-${j}" aria-label="第 ${j+1} 組重量">
       <input inputmode="numeric" placeholder="次數" value="${esc(s.r)}" data-f="r" data-i="${i}" data-s="${j}" id="r-${i}-${j}" aria-label="第 ${j+1} 組次數">
       <label class="chk"><input type="checkbox" data-f="d" data-i="${i}" data-s="${j}" id="d-${i}-${j}" ${s.d?'checked':''}>完成</label>
       <button class="x" data-a="rmset" data-i="${i}" data-s="${j}" aria-label="刪除第 ${j+1} 組">×</button></div>`).join('')}</div>
-    <div class="row"><button data-a="addset" data-i="${i}">＋ 加一組</button><button data-a="timer" data-v="${it.rest||90}">休息 ${it.rest||90} 秒</button>${it.id&&EX[it.id]?'<span class="sm">'+links(EX[it.id])+'</span>':''}</div></section>`).join('');
+    <div class="row"><button data-a="addset" data-i="${i}">＋ 加一組</button><button data-a="unit" data-i="${i}" aria-label="切換公斤與磅並換算">${it.u==='lb'?'磅 lb':'公斤 kg'} ⇄</button>${it.id&&alts(it.id).length?`<button data-a="swap" data-i="${i}" aria-expanded="${swapAt===i}">換動作</button>`:''}${it.id&&EX[it.id]?'<span class="sm">'+links(EX[it.id])+'</span>':''}</div>
+    <div class="row"><label class="mu sm" for="rest-${i}">組間休息</label><select data-f="rest" data-i="${i}" id="rest-${i}">${[...new Set([30,60,90,120,150,it.rest||90])].sort((a,b)=>a-b).map(x=>`<option value="${x}" ${x===(it.rest||90)?'selected':''}>${x} 秒</option>`).join('')}</select><button data-a="timer" data-i="${i}">開始計時</button><button data-a="fav" data-i="${i}">存成常用</button></div>
+    ${swapAt===i?`<div class="sets"><p class="mu sm">器材有人在用，或想換簡單一點的？選一個練到相同部位的替代動作：</p>${alts(it.id).map(a=>`<button data-a="doswap" data-i="${i}" data-v="${a}" style="text-align:left">${esc(EX[a].n)} ${EX[a].easy?'<span class="tag">好上手</span>':''}<span class="mu sm">　${esc(EX[a].eq)}</span></button>`).join('')}</div>`:''}</section>`).join('');
   else h+=`<p class="mu">這天還沒有紀錄。</p>`;
-  h+=`<section class="card"><h3>新增項目</h3><div class="row"><select id="add-ex" aria-label="從動作庫選擇" style="flex:1">${GROUPS.map(g=>`<optgroup label="${g}">${Object.keys(EX).filter(k=>EX[k].g===g).map(k=>`<option value="${k}">${EX[k].n}</option>`).join('')}</optgroup>`).join('')}</select><button data-a="addex">加入</button></div>
+  h+=`<section class="card"><h3>新增項目</h3>${st.favs.length?`<div class="sets"><div class="mu sm">常用紀錄：點一下帶入當時的重量與次數</div>${st.favs.map((f,k)=>`<div class="row bt"><button data-a="usefav" data-v="${k}" style="flex:1;text-align:left;min-width:0"><b>${esc(f.name)}</b><span class="mu sm">　${esc(f.sets.map(x=>(x.w?x.w+f.u+' ':'')+(x.r?x.r+'下':'')).join('、'))}</span></button><button class="x" data-a="rmfav" data-v="${k}" aria-label="刪除常用紀錄 ${esc(f.name)}">×</button></div>`).join('')}</div>`:''}<div class="row"><select id="add-ex" aria-label="從動作庫選擇" style="flex:1">${GROUPS.map(g=>`<optgroup label="${g}">${Object.keys(EX).filter(k=>EX[k].g===g).map(k=>`<option value="${k}">${esc(EX[k].n)}</option>`).join('')}</optgroup>`).join('')}</select><button data-a="addex">加入</button></div>
   <div class="row"><input type="text" id="add-name" placeholder="或自己輸入，例如：排球練習 90 分鐘" style="flex:1" maxlength="40"><button data-a="addcustom">加入</button></div></section>
   <section class="card"><h3><label for="note">備註</label></h3><textarea id="note" placeholder="今天的狀況、痠痛部位、睡眠…">${esc(log?log.note:'')}</textarea><p class="mu sm">輸入後自動儲存。勾選「完成」會自動開始該項目的休息計時。</p></section>`;
   return h;
@@ -280,20 +382,22 @@ function vPlan(){
   const chips=(cls,arr,act)=>`<div class="chips ${cls}">${WD.map((d,i)=>`<button data-a="${act}" data-v="${i}" aria-pressed="${arr.includes(i)}">${d}</button>`).join('')}</div>`;
   const opts=(o,v)=>Object.keys(o).map(k=>`<option value="${k}" ${String(k)===String(v)?'selected':''}>${o[k]}</option>`).join('');
   let h=`<h1>一週課表</h1><section class="card">
-  <div class="row"><label class="f">目標<select id="set-goal">${opts(GOALS,s.goal)}</select></label><label class="f">程度<select id="set-lv">${opts(LEVELS,s.lv)}</select></label></div>
-  <label class="f">器材<select id="set-env">${opts(ENVS,s.env)}</select></label>
+  <div class="row"><label class="f">目標<select id="set-goal">${opts(Object.fromEntries(Object.keys(GOALS).concat(Object.keys(st.goals)).map(k=>[k,goalOf(k).n+(GOALS[k]?'':'（自訂）')])),s.goal)}</select></label><label class="f">程度<select id="set-lv">${opts(LEVELS,s.lv)}</select></label></div>
+  <details class="plain sm"><summary>找不到你的運動？新增自訂目標</summary><div class="row" style="margin-top:8px"><input type="text" id="g-n" maxlength="20" placeholder="運動名稱，例如：網球" style="flex:1" aria-label="自訂運動名稱"><select id="g-pl" aria-label="訓練類型">${Object.keys(PL).map(k=>`<option value="${k}">${PL[k].l}</option>`).join('')}</select><button data-a="addgoal">新增</button></div></details>
+  ${st.goals[s.goal]?'<div class="row"><button data-a="delgoal" class="sm">刪除自訂目標「'+esc(goalOf(s.goal).n)+'」</button></div>':''}
+  <div class="row"><label class="f">器材<select id="set-env">${opts(ENVS,s.env)}</select></label><label class="f">每次可用時間（分鐘）<input type="text" inputmode="numeric" id="set-mins" maxlength="3" value="${esc(s.mins||'')}" placeholder="留空＝系統建議"></label></div>
   <div><div class="row bt"><span class="mu sm">重量訓練日（選 2–5 天，目前 ${s.days.length} 天）</span><button data-a="suggest" class="sm">套用建議</button></div>${chips('',s.days,'tgday')}</div>
-  ${sp?`<div><span class="mu sm">打球／專項練習日（排課時會避免前一天練重腿）</span>${chips('ball',s.ball,'tgball')}</div>`:''}
+  ${sp?`<div><span class="mu sm">專項練習日，例如打球、下水的日子（排課時會避免前一天練重腿）</span>${chips('ball',s.ball,'tgball')}</div>`:''}
   <p class="mu sm">建議頻率：初學每週 3 次、中階 4 次、進階 5 次；比賽期或打球天數多時減 1 次。</p>
   <button class="pri" data-a="gen">${st.plan?'重新產生課表':'產生一週課表'}</button></section>`;
   if(st.plan){
     const tw=wd(today());
-    h+=`<p class="mu sm">目前課表：${GOALS[st.plan.goal]}・${LEVELS[st.plan.lv].split('（')[0]}・${ENVS[st.plan.env].split('（')[0]}。重量以「做完還有 1–2 下餘力」為準，連續兩次都能做滿建議次數上限再加重。</p>`;
+    h+=`<p class="mu sm">目前課表：${esc(goalOf(st.plan.goal).n)}・${LEVELS[st.plan.lv].split('（')[0]}・${ENVS[st.plan.env].split('（')[0]}。重量以「做完還有 1–2 下餘力」為準，連續兩次都能做滿建議次數上限再加重。${goalOf(st.plan.goal).tip?'<br>'+goalOf(st.plan.goal).tip:''}</p>`;
     for(let d=0;d<7;d++){
       const p=st.plan.days[d],ball=st.plan.ball.includes(d);
-      if(p)h+=`<section class="card"><details class="plain" ${d===tw?'open':''}><summary>週${WD[d]}　${p.t} ${ball?'<span class="tag">同日打球</span>':''}</summary>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">${ball?'<p class="sm">同一天也要打球時，重量訓練建議排在打球之後，或兩者間隔 6 小時以上。</p>':''}${sesHTML(p)}</div></details></section>`;
-      else h+=`<section class="card"><div class="row bt"><b>週${WD[d]}</b>${ball?'<span class="tag">打球／專項練習</span>':'<span class="tag rest">休息</span>'}</div></section>`;
+      if(p)h+=`<section class="card"><details class="plain" ${d===tw?'open':''}><summary>週${WD[d]}　${p.t} <span class="mu sm" style="font-weight:400">約 ${p.min||est(p.items)} 分</span> ${ball?'<span class="tag">同日專項</span>':''}</summary>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">${ball?'<p class="sm">同一天也有專項練習時，重量訓練建議排在練習之後，或兩者間隔 6 小時以上。</p>':''}${sesHTML(p)}</div></details></section>`;
+      else h+=`<section class="card"><div class="row bt"><b>週${WD[d]}</b>${ball?'<span class="tag">專項練習</span>':'<span class="tag rest">休息</span>'}</div></section>`;
     }
   }
   return h;
@@ -306,7 +410,7 @@ function vHist(){
   const wk=ds.filter(d=>d>=m0&&d<=today()).length,mo=ds.filter(d=>d.slice(0,7)===today().slice(0,7)).length;
   let h=`<h1>歷史紀錄</h1><section class="card"><div class="row"><div class="stat"><b>${wk}</b><span class="mu sm">本週訓練天數</span></div><div class="stat"><b>${mo}</b><span class="mu sm">本月</span></div><div class="stat"><b>${ds.length}</b><span class="mu sm">累計</span></div></div></section>`;
   h+=ds.length?ds.map(d=>{const l=st.logs[d];return `<section class="card"><div class="row bt"><div><b>${nice(d)}</b>${l.title?'　<span class="tag">'+esc(l.title)+'</span>':''}</div><span class="mu sm">${d.slice(0,4)}</span></div>
-    <div class="sm">${l.items.map(it=>{const a=it.sets.filter(s=>s.r||s.d).map(s=>(s.w?s.w+'kg×':'')+(s.r||'✓'));return '<div><b>'+esc(it.name)+'</b>'+(a.length?'：'+esc(a.join('、')):'')+'</div>'}).join('')}${l.note?'<div class="mu">備註：'+esc(l.note)+'</div>':''}</div>
+    <div class="sm">${l.items.map(it=>{const a=it.sets.filter(s=>s.r||s.d).map(s=>(s.w?s.w+(it.u||'kg')+'×':'')+(s.r||'✓'));return '<div><b>'+esc(it.name)+'</b>'+(a.length?'：'+esc(a.join('、')):'')+'</div>'}).join('')}${l.note?'<div class="mu">備註：'+esc(l.note)+'</div>':''}</div>
     <div class="row"><button data-a="open" data-v="${d}">查看／編輯</button><button data-a="del" data-v="${d}">${delAsk===d?'再按一次確定刪除':'刪除'}</button></div></section>`}).join('')
    :`<p class="mu">還沒有任何紀錄。到「今日」記下第一次訓練，這裡就會出現。</p>`;
   h+=`<section class="card"><h3>備份與轉移</h3><p class="mu sm">紀錄存在這台裝置的這個瀏覽器裡。換手機、換瀏覽器或清除瀏覽資料前，請先匯出備份檔。</p>
@@ -315,23 +419,49 @@ function vHist(){
 }
 
 /* ---------- 動作庫 ---------- */
+const SLOTINFO={squat:['深蹲類（下肢主項）','下肢','main'],hinge:['硬舉／髖伸類（下肢主項）','下肢','main'],uni:['單腳動作','下肢','acc'],legpress:['下肢輔助（腿推類）','下肢','acc'],ham:['腿後勾類','下肢','acc'],calf:['小腿','下肢','iso'],
+jump:['垂直跳躍','爆發','power'],broad:['水平跳躍','爆發','power'],bound:['側向跳躍','爆發','power'],throw:['投擲／砸球','爆發','power'],
+hpush:['水平推（臥推類）','胸','main'],ipush:['上斜推','胸','acc'],vpush:['垂直推（肩推類）','肩','main'],lat:['側平舉類','肩','iso'],rear:['後三角／肩胛','肩','acc'],er:['肩外旋','肩','pre'],tri:['三頭孤立','三頭','iso'],
+vpull:['垂直拉（下拉、引體類）','背','main'],hpull:['水平拉（划船類）','背','main'],bi:['二頭孤立','二頭','iso'],
+core1:['核心穩定（棒式類）','核心','core'],core2:['核心控制（死蟲類）','核心','core'],anti:['抗旋轉／側向核心','核心','core'],rot:['核心旋轉','核心','core'],hang:['抬腿類','核心','core'],cond:['體能間歇','體能','cond'],latlunge:['側向弓箭步','下肢','acc'],grip:['握力','握力','acc'],wrist:['前臂／手腕','握力','iso']};
 function libList(){
   const k=q.trim().toLowerCase();
   const out=GROUPS.map(g=>{
-    const a=Object.values(EX).filter(e=>e.g===g&&(!k||(e.n+e.p+e.s+e.eq+e.g).toLowerCase().includes(k)));
-    return a.length?`<h2>${g}</h2>`+a.map(ex=>{const d=dose(ex.k,ex);return `<section class="card"><details class="plain"><summary>${ex.n}　<span class="mu sm" style="font-weight:400">${ex.eq}</span></summary>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px"><div class="dose">${d.sets} 組 × ${d.reps}・組間休息 ${d.rest} 秒</div>
-      <div class="mu sm">主要：${ex.p}｜協同：${ex.s}</div><p>${ex.c}</p><p class="sm">${links(ex)}</p></div></details></section>`}).join(''):'';
+    const a=Object.keys(EX).filter(id=>{const e=EX[id];return e.g===g&&(!k||(e.n+e.p+e.s+e.eq+e.g).toLowerCase().includes(k))});
+    return a.length?`<h2>${g}</h2>`+a.map(id=>{const ex=EX[id],d=dose(ex.k,ex),im=st.imgs[id];return `<section class="card"><details class="plain" ${openEx===id?'open':''}><summary>${esc(ex.n)}${ex.custom?' <span class="tag">自訂</span>':''}　<span class="mu sm" style="font-weight:400">${esc(ex.eq)}</span></summary>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px"><div class="dose">${d.sets} 組 × ${esc(d.reps)}・組間休息 ${d.rest} 秒</div>
+      <div class="mu sm">主要：${esc(ex.p)}｜協同：${esc(ex.s)}${ex.custom?'｜'+(ex.slot?'排課位置：'+SLOTINFO[ex.slot][0]:'不排進課表'):''}</div>${fig(ex,id)}<p>${esc(ex.c)}</p><p class="sm">${links(ex)}</p>
+      <div class="row sm"><button data-a="addimg" data-v="${id}">${im?'更換我的圖片':'加上我的圖片'}</button>${im?`<button data-a="rmimg" data-v="${id}">移除圖片</button>`:''}${ex.custom?`<button data-a="editex" data-v="${id}">編輯</button><button data-a="delex" data-v="${id}">${delAsk==='ex:'+id?'再按一次確定刪除':'刪除'}</button>`:''}</div></div></details></section>`}).join(''):'';
   }).join('');
   return out||'<p class="mu">找不到符合的動作，換個關鍵字試試。</p>';
 }
-function vLib(){
-  return `<h1>動作庫</h1><input type="search" id="lib-q" placeholder="搜尋動作、部位或器材，例如：三頭、滑輪" value="${esc(q)}" aria-label="搜尋動作">
-  <p class="mu sm">組數與休息時間依你在「計畫」選的目標（${GOALS[st.set.goal]}）與程度調整。點動作可看做法；「教學影片」與「動作圖解」會開啟 YouTube 與 Google 圖片的搜尋結果。</p><div id="lib-list" style="display:flex;flex-direction:column;gap:14px">${libList()}</div>`;
+function formHTML(){
+  const f=form,v=k=>esc(f[k]||''),cs=f.slot||('none:'+(f.g||'下肢'));
+  const so=GROUPS.map(g=>{const a=Object.keys(SLOTINFO).filter(k=>SLOTINFO[k][1]===g);return `<optgroup label="${g}">${a.map(k=>`<option value="${k}" ${k===cs?'selected':''}>${SLOTINFO[k][0]}</option>`).join('')}</optgroup>`}).join('')
+    +`<optgroup label="只放動作庫，不排進課表">${GROUPS.map(g=>`<option value="none:${g}" ${cs==='none:'+g?'selected':''}>${g}（不排課）</option>`).join('')}</optgroup>`;
+  const eo=[['gym','健身房器械或槓鈴'],['db','只需要啞鈴'],['bw','徒手可做']].map(x=>`<option value="${x[0]}" ${f.e===x[0]?'selected':''}>${x[1]}</option>`).join('');
+  return `<section class="card form"><h2>${f.id?'編輯自訂動作':'新增自訂動作'}</h2>
+  <label class="f">名稱<input type="text" id="f-n" maxlength="30" value="${v('n')}" placeholder="例如：史密斯機深蹲"></label>
+  <label class="f">動作類型（決定排在課表的哪個位置）<select id="f-slot">${so}</select></label>
+  <div class="row"><label class="f">需要的器材<select id="f-e">${eo}</select></label><label class="f">器材名稱<input type="text" id="f-eq" maxlength="40" value="${v('eq')}" placeholder="例如：史密斯機"></label></div>
+  <div class="row"><label class="f">主要肌群<input type="text" id="f-p" maxlength="40" value="${v('p')}" placeholder="例如：股四頭、臀"></label><label class="f">協同肌群<input type="text" id="f-s" maxlength="40" value="${v('s')}" placeholder="例如：核心"></label></div>
+  <div class="row"><label class="f" style="min-width:80px">組數<input type="text" id="f-sets" inputmode="numeric" value="${v('sets')}" placeholder="自動"></label><label class="f" style="min-width:80px">次數<input type="text" id="f-r" maxlength="20" value="${v('r')}" placeholder="自動"></label><label class="f" style="min-width:80px">休息秒數<input type="text" id="f-rest" inputmode="numeric" value="${v('rest')}" placeholder="自動"></label></div>
+  <label class="f">做法或注意事項<textarea id="f-c" maxlength="400">${v('c')}</textarea></label>
+  <label class="f">影片或說明網址（選填）<input type="text" id="f-url" inputmode="url" value="${v('url')}" placeholder="https://"></label>
+  <p class="mu sm">組數、次數、休息留空會依目標與程度自動建議。肌群請用常見名稱（胸、背、三頭、二頭、肩、股四頭、臀、腿後、小腿、核心…），示意圖會依文字自動標色。同一個動作類型裡，自訂動作會優先於預設動作被排進課表。照片可在儲存後到動作卡片裡加上。</p>
+  <div class="row"><button class="pri" data-a="saveex">儲存</button><button data-a="cancelex">取消</button></div></section>`;
 }
+function vLib(){
+  return `<h1>動作庫</h1>${form?formHTML():'<button class="pri" data-a="newex">＋ 新增自訂動作</button>'}
+  <input type="search" id="lib-q" placeholder="搜尋動作、部位或器材，例如：三頭、滑輪" value="${esc(q)}" aria-label="搜尋動作">
+  <p class="mu sm">組數與休息時間依你在「計畫」選的目標（${esc(goalOf(st.set.goal).n)}）與程度調整。點動作可看肌群示意圖與做法，也可以加上自己拍的器材或動作照片；「教學影片」與「動作圖解」會開啟 YouTube 與 Google 圖片的搜尋結果。</p><div id="lib-list" style="display:flex;flex-direction:column;gap:14px">${libList()}</div>`;
+}
+function readImg(file,cb){const r=new FileReader();r.onload=()=>{const im=new Image();
+  im.onload=()=>{const m=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*m);c.height=Math.round(im.height*m);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.72))};
+  im.onerror=()=>toast('無法讀取這張圖片');im.src=r.result};r.readAsDataURL(file)}
 
 function render(){
-  $('#app').innerHTML=tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():vLib();
+  $('#app').innerHTML=`<header class="top"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#2450e6"/><rect x="14" y="21.5" width="20" height="5" rx="2" fill="#fff"/><rect x="9" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="33" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="5" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><rect x="39" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><circle cx="38" cy="9" r="4" fill="#ff5c9a"/></svg><div><b>訓練手帳</b><span>排課表・記重量・看進步</span></div><button data-a="theme">${{'':'外觀：自動',light:'外觀：淺色',dark:'外觀：深色'}[st.theme||'']}</button></header>`+(tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():vLib());
   document.querySelectorAll('nav.tabs button').forEach(b=>b.dataset.v===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 }
 
@@ -344,17 +474,35 @@ function addItem(o){getLog().items.push(o);save();render()}
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;
   const a=b.dataset.a,v=b.dataset.v,i=+b.dataset.i,s=+b.dataset.s;
-  if(a!=='del')delAsk=null;
+  if(a!=='del'&&a!=='delex')delAsk=null;
+  if(a!=='swap'&&a!=='doswap')swapAt=null;
   if(a==='tab'){tab=v;render();window.scrollTo(0,0)}
   else if(a==='day'){const d=parse(cur);d.setDate(d.getDate()+ +v);cur=fmt(d);render()}
-  else if(a==='load'){const p=st.plan.days[wd(cur)],l=getLog();l.title=p.t;
-    p.items.forEach(it=>l.items.push({id:it.id,name:EX[it.id].n,rest:it.rest,dose:it.sets+' 組 × '+it.reps,sets:Array.from({length:it.sets},()=>({w:'',r:'',d:false}))}));save();render()}
-  else if(a==='addex'){const id=$('#add-ex').value,ex=EX[id],d=dose(ex.k,ex);addItem({id,name:ex.n,rest:d.rest,dose:d.sets+' 組 × '+d.reps,sets:[{w:'',r:'',d:false}]})}
-  else if(a==='addcustom'){const n=$('#add-name').value.trim();if(!n){$('#add-name').focus();return}addItem({name:n,rest:90,sets:[{w:'',r:'',d:false}]})}
+  else if(a==='load'){const p=st.plan.days[wd(cur)],items=JSON.parse(JSON.stringify(p.items.filter(it=>EX[it.id])));
+    items.forEach(it=>it.ty=it.ty||EX[it.id].k);
+    if(v==='fit'){const B=parseInt($('#today-mins').value)||0;if(B<15){toast('請輸入今天可用的分鐘數（至少 15）');$('#today-mins').focus();return}fit(items,B,1)}
+    const l=getLog();l.title=p.t+(v==='fit'?'（精簡）':'');
+    items.forEach(it=>l.items.push({id:it.id,name:EX[it.id].n,u:st.unit||'kg',rest:it.rest,dose:it.sets+' 組 × '+it.reps,sets:Array.from({length:it.sets},()=>({w:'',r:'',d:false}))}));
+    if(v==='light')lighten(l);save();render();if(v==='fit')toast('已精簡，預估約 '+est(items)+' 分鐘')}
+  else if(a==='unit'){const it=st.logs[cur].items[i],toLb=it.u!=='lb';it.u=toLb?'lb':'kg';st.unit=it.u;
+    it.sets.forEach(x=>{const n=parseFloat(x.w);if(!isNaN(n))x.w=String(Math.round((toLb?n*2.20462:n/2.20462)*2)/2)});save();render()}
+  else if(a==='fav'){const it=st.logs[cur].items[i],ss=it.sets.filter(x=>x.w||x.r).map(x=>({w:x.w,r:x.r}));
+    if(!ss.length){toast('先填入重量或次數再儲存');return}
+    st.favs=st.favs.filter(f=>f.name!==it.name);st.favs.unshift({id:it.id,name:it.name,u:it.u||'kg',rest:it.rest||90,sets:ss,date:cur});save();render();toast('已存成常用，可在「新增項目」快速取用')}
+  else if(a==='usefav'){const f=st.favs[+v];addItem({id:f.id&&EX[f.id]?f.id:undefined,name:f.name,u:f.u,rest:f.rest,dose:f.sets.length+' 組（沿用常用紀錄）',sets:f.sets.map(x=>({w:x.w,r:x.r,d:false}))})}
+  else if(a==='rmfav'){st.favs.splice(+v,1);save();render()}
+  else if(a==='addgoal'){const n=$('#g-n').value.trim();if(!n){toast('請輸入運動名稱');return}const id='g'+Date.now().toString(36);st.goals[id]={n,pl:$('#g-pl').value};st.set.goal=id;save();render();toast('已新增，按「產生一週課表」套用')}
+  else if(a==='delgoal'){const id=st.set.goal;delete st.goals[id];st.set.goal='vb';if(st.plan&&st.plan.goal===id)st.plan=null;save();render()}
+  else if(a==='theme'){st.theme={'':'light',light:'dark',dark:''}[st.theme||''];sync();save();render()}
+  else if(a==='lighten'){lighten(st.logs[cur]);save();render()}
+  else if(a==='swap'){swapAt=swapAt===i?null:i;render()}
+  else if(a==='doswap'){const it=st.logs[cur].items[i],ex=EX[v],d=dose(ex.k,ex);it.id=v;it.name=ex.n;it.rest=d.rest;it.dose=it.sets.length+' 組 × '+d.reps;swapAt=null;save();render()}
+  else if(a==='addex'){const id=$('#add-ex').value,ex=EX[id],d=dose(ex.k,ex);addItem({id,name:ex.n,u:st.unit||'kg',rest:d.rest,dose:d.sets+' 組 × '+d.reps,sets:[{w:'',r:'',d:false}]})}
+  else if(a==='addcustom'){const n=$('#add-name').value.trim();if(!n){$('#add-name').focus();return}addItem({name:n,u:st.unit||'kg',rest:90,sets:[{w:'',r:'',d:false}]})}
   else if(a==='addset'){const it=st.logs[cur].items[i],l=it.sets[it.sets.length-1]||{};it.sets.push({w:l.w||'',r:l.r||'',d:false});save();render()}
   else if(a==='rmset'){st.logs[cur].items[i].sets.splice(s,1);save();render()}
   else if(a==='rmitem'){st.logs[cur].items.splice(i,1);clean();save();render()}
-  else if(a==='timer')startTimer(v)
+  else if(a==='timer')startTimer(st.logs[cur].items[i].rest||90)
   else if(a==='stoptimer'){clearInterval(tm);$('#timer').hidden=true}
   else if(a==='tgday'||a==='tgball'){const arr=a==='tgday'?st.set.days:st.set.ball,x=+v,k=arr.indexOf(x);
     if(k>=0)arr.splice(k,1);else if(a==='tgday'&&arr.length>=5){toast('重量訓練最多排 5 天，留時間恢復');return}else arr.push(x);save();render()}
@@ -364,11 +512,30 @@ document.addEventListener('click',e=>{
   else if(a==='del'){if(delAsk===v){delete st.logs[v];delAsk=null;save()}else delAsk=v;render()}
   else if(a==='export'){const x=document.createElement('a');x.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,1)],{type:'application/json'}));x.download='訓練手帳備份-'+today()+'.json';document.body.appendChild(x);x.click();x.remove()}
   else if(a==='import')$('#imp').click()
+  else if(a==='newex'){form={e:'gym'};render()}
+  else if(a==='editex'){form=Object.assign({id:v},st.custom[v]);render();window.scrollTo(0,0)}
+  else if(a==='cancelex'){form=null;render()}
+  else if(a==='saveex'){
+    const g=x=>$('#f-'+x).value.trim(),n=g('n'),sv=g('slot');
+    if(!n){toast('請輸入動作名稱');$('#f-n').focus();return}
+    const slot=sv.startsWith('none:')?'':sv,info=SLOTINFO[slot],url=g('url');
+    if(url&&!/^https?:\/\//.test(url)){toast('網址要以 http:// 或 https:// 開頭');$('#f-url').focus();return}
+    const id=form.id||'c'+Date.now().toString(36);
+    st.custom[id]={custom:1,n,slot,g:info?info[1]:sv.slice(5),k:info?info[2]:'acc',e:g('e'),eq:g('eq')||'未填',p:g('p')||'未填',s:g('s')||'無',c:g('c'),url,
+      sets:Math.min(10,Math.max(0,parseInt(g('sets'))||0)),r:g('r'),rest:Math.min(600,Math.max(0,parseInt(g('rest'))||0))};
+    sync();form=null;openEx=id;save();render();toast(slot?'已儲存。重新產生課表後會排進去':'已儲存到動作庫')}
+  else if(a==='delex'){openEx=v;
+    if(delAsk==='ex:'+v){delete st.custom[v];delete st.imgs[v];delAsk=null;
+      if(st.plan)for(const d in st.plan.days)st.plan.days[d].items=st.plan.days[d].items.filter(it=>it.id!==v);
+      sync();save()}else delAsk='ex:'+v;
+    render()}
+  else if(a==='addimg'){imgFor=v;openEx=v;$('#img-in').value='';$('#img-in').click()}
+  else if(a==='rmimg'){delete st.imgs[v];openEx=v;save();render()}
 });
 document.addEventListener('input',e=>{
   const t=e.target,f=t.dataset.f;
   if(f){const it=st.logs[cur].items[+t.dataset.i],s=it.sets[+t.dataset.s];
-    if(f==='d'){s.d=t.checked;if(s.d)startTimer(it.rest||90)}else s[f]=t.value;save()}
+    if(f==='rest')it.rest=+t.value;else if(f==='d'){s.d=t.checked;if(s.d)startTimer(it.rest||90)}else s[f]=t.value;save()}
   else if(t.id==='note'){getLog().note=t.value;clean();save()}
   else if(t.id==='lib-q'){q=t.value;$('#lib-list').innerHTML=libList()}
 });
@@ -377,9 +544,11 @@ document.addEventListener('change',e=>{
   if(t.id==='cur-date'&&t.value){cur=t.value;render()}
   else if(t.id==='set-goal'){st.set.goal=t.value;save();render()}
   else if(t.id==='set-lv'){st.set.lv=+t.value;save();render()}
+  else if(t.id==='set-mins'){st.set.mins=t.value.replace(/\D/g,'');save()}
   else if(t.id==='set-env'){st.set.env=t.value;save();render()}
+  else if(t.id==='img-in'&&t.files[0]&&imgFor){const id=imgFor;readImg(t.files[0],u=>{st.imgs[id]=u;if(!save())delete st.imgs[id];render()})}
   else if(t.id==='imp'&&t.files[0]){const r=new FileReader();
-    r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d.logs!=='object'||!d.set)throw 0;st=d;save();render();toast('已匯入備份')}catch(x){toast('這個檔案不是訓練手帳的備份檔')}};
+    r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d.logs!=='object'||!d.set)throw 0;st=d;sync();save();render();toast('已匯入備份')}catch(x){toast('這個檔案不是訓練手帳的備份檔')}};
     r.readAsText(t.files[0])}
 });
 render();
