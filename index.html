@@ -6,6 +6,12 @@
 <title>訓練手帳</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20aria-hidden%3D%22true%22%3E%3Crect%20width%3D%2248%22%20height%3D%2248%22%20rx%3D%2212%22%20fill%3D%22%232450e6%22/%3E%3Crect%20x%3D%2214%22%20y%3D%2221.5%22%20width%3D%2220%22%20height%3D%225%22%20rx%3D%222%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%229%22%20y%3D%2214%22%20width%3D%226%22%20height%3D%2220%22%20rx%3D%223%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%2233%22%20y%3D%2214%22%20width%3D%226%22%20height%3D%2220%22%20rx%3D%223%22%20fill%3D%22%23fff%22/%3E%3Crect%20x%3D%225%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23ffd0e2%22/%3E%3Crect%20x%3D%2239%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2212%22%20rx%3D%222%22%20fill%3D%22%23ffd0e2%22/%3E%3Ccircle%20cx%3D%2238%22%20cy%3D%229%22%20r%3D%224%22%20fill%3D%22%23ff5c9a%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f2f4fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1220" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-title" content="訓練手帳">
 <meta name="description" content="記錄每日訓練、產生一週課表（含暖身、收操與部位銜接）的健身 web app">
 <style>
@@ -15,7 +21,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "PingFang TC","Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
- padding:20px max(16px,env(safe-area-inset-right,0px)) calc(96px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+ padding:calc(20px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(96px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 main{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 h1{font-size:26px;line-height:1.25;margin:4px 0 0}
 h2{font-size:19px;margin:0}
@@ -282,7 +288,7 @@ function fit(items,B,noGrow){
   while(over()&&items.length>2)items.pop();
   if(!noGrow)for(const t of ['main','acc'])for(const it of items)if(it.ty===t&&it.sets<6){it.sets++;if(over()){it.sets--;return}}
 }
-function build(k){
+function build(k,noFit){
   const S=SES[k],items=[];
   for(const sl of S.slots){
     const [name,ov]=sl.split(':'),id=Object.keys(st.custom).filter(x=>st.custom[x].slot===name).concat(SLOT[name]).find(x=>okEq(EX[x]));
@@ -291,7 +297,7 @@ function build(k){
     if(ty==='power'&&!plOf(st.set.goal).pw)continue;
     items.push(Object.assign({id,ty},dose(ty,ex)));
   }
-  const B=parseInt(st.set.mins)||0;if(B)fit(items,B);
+  const B=noFit?0:parseInt(st.set.mins)||0;if(B)fit(items,B);
   const pw=plOf(st.set.goal).pw;
   return {k,t:!pw&&S.t2?S.t2:S.t,note:!pw&&S.cut?S.note.replace(/^[^。]*。/,''):S.note,items,min:est(items),tight:B&&estRaw(items)>B+2?1:0};
 }
@@ -354,10 +360,15 @@ function vToday(){
   const w=wd(cur),p=st.plan&&st.plan.days[w],log=st.logs[cur],has=log&&log.items.length;
   let h=`<div class="row nav bt"><button data-a="day" data-v="-1" aria-label="前一天">‹</button><input type="date" id="cur-date" value="${cur}" aria-label="日期"><button data-a="day" data-v="1" aria-label="後一天">›</button></div>
   <h1>${nice(cur)}${cur===today()?'・今天':''}</h1>`;
-  if(p)h+=`<section class="card"><div class="eb">當日課表</div><h2>${p.t}</h2>${sesHTML(p)}${has?'':'<button class="pri" data-a="load">開始訓練：把這些項目加入紀錄</button><button data-a="load" data-v="light">今天比較累：用輕量版開始</button><div class="row"><input type="text" inputmode="numeric" id="today-mins" placeholder="今天只有幾分鐘？" style="flex:1" aria-label="今天可用的分鐘數"><button data-a="load" data-v="fit">依時間精簡後開始</button></div>'}</section>`;
+  if(p)h+=`<section class="card"><div class="eb">當日課表</div><details class="plain" ${has?'':'open'}><summary><span style="font-size:19px">${p.t}</span> <span class="mu sm" style="font-weight:400">約 ${p.min||est(p.items)} 分</span></summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">${sesHTML(p)}</div></details>${has?'<p class="mu sm">訓練中已收合，點標題可展開看暖身、做法與收操。</p>':'<button class="pri" data-a="load">開始訓練：把這些項目加入紀錄</button><button data-a="load" data-v="light">今天比較累：用輕量版開始</button><div class="row"><input type="text" inputmode="numeric" id="today-mins" placeholder="今天只有幾分鐘？" style="flex:1" aria-label="今天可用的分鐘數"><button data-a="load" data-v="fit">依時間精簡後開始</button></div>'}</section>`;
   else if(st.plan)h+=`<section class="card"><div class="eb">當日課表</div><h2>${st.plan.ball.includes(w)?'專項練習日':'休息日'}</h2><p class="mu sm">今天沒有排重量訓練。如果有做其他運動，可以在下面自行新增紀錄。</p></section>`;
   else h+=`<section class="card"><h2>還沒有課表</h2><p class="mu sm">到「計畫」選目標與訓練日，就會排出一週課表。也可以直接在下面記錄今天做了什麼。</p><div class="row"><button class="pri" data-a="tab" data-v="plan">去排課表</button><button data-a="tab" data-v="help">第一次用？看使用說明</button></div></section>`;
+  if(!has)h+=`<section class="card"><details class="plain"><summary>${p?'不想照今天的課表？':'想臨時練一下？'}另排一份臨時課表</summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">
+    ${p?`<p class="mu sm">原本的課表（參考用）：${p.items.filter(it=>EX[it.id]).map(it=>esc(EX[it.id].n)+' '+it.sets+' 組').join('、')}</p>`:''}
+    <div class="row"><label class="f">想練的重點<select id="ah-k">${Object.keys(SES).map(k=>`<option value="${k}" ${p&&p.k===k?'selected':''}>${(!plOf(st.set.goal).pw&&SES[k].t2)||SES[k].t}</option>`).join('')}</select></label><label class="f" style="min-width:90px;flex:0 1 110px">要做幾個項目<select id="ah-n">${[2,3,4,5,6,7,8].map(n=>`<option ${n===5?'selected':''}>${n}</option>`).join('')}</select></label></div>
+    <button class="pri" data-a="adhoc">推薦項目並開始訓練</button><p class="mu sm">會依你在「計畫」選的目標、程度與器材挑動作，只用在這一天，不會改掉一週課表。</p></div></details></section>`;
   h+=`<h2>訓練紀錄</h2>`;
+  if(has)h+=`<div class="row"><button data-a="cancel">${delAsk==='cancel'?'再按一次確定：清空這天全部項目':'取消這次訓練（清空全部項目）'}</button></div>`;
   if(has&&log.light)h+=`<section class="card"><div class="eb">輕量版</div><p class="sm">每個項目少一組，重量降到平常的八成左右，每組做完還有 3–4 下餘力就停；跳躍類求輕快、不求高度。想換成比較好上手的動作，按項目下方的「換動作」。如果是關節痛、頭暈或生病，請直接休息。</p></section>`;
   else if(has&&log.title)h+=`<div class="row"><button data-a="lighten">今天比較累：改成輕量版</button></div>`;
   if(has)h+=log.items.map((it,i)=>`<section class="card"><div class="row bt"><h3>${esc(it.name)}</h3><button class="x" data-a="rmitem" data-i="${i}" aria-label="移除 ${esc(it.name)}">×</button></div>
@@ -466,17 +477,18 @@ function readImg(file,cb){const r=new FileReader();r.onload=()=>{const im=new Im
 function vHelp(){
   const sec=(t,body,open)=>`<details ${open?'open':''}><summary>${t}</summary>${body}</details>`;
   return `<h1>使用說明</h1><p class="mu sm">點標題可展開或收合。下方五個分頁分別是：今日（記錄訓練）、計畫（排一週課表）、紀錄（歷史與備份）、動作庫（查動作與新增自訂動作）、說明（本頁）。</p><div class="help" style="display:flex;flex-direction:column;gap:10px">
-  ${sec('快速開始：三步驟',`<ol><li>到「計畫」選目標、程度、器材，點選一週要訓練的日子，按「產生一週課表」。</li><li>訓練當天到「今日」，按「開始訓練」，課表的項目就會變成可填寫的紀錄。</li><li>每做完一組，填重量與次數並勾「完成」，休息倒數會自動開始。</li></ol><p class="mu sm">不排課表也可以用：直接在「今日」最下面的「新增項目」加入當天做的動作。</p>`,1)}
+  ${sec('快速開始：三步驟',`<ol><li>到「計畫」選目標、程度、器材，點選一週要訓練的日子，按「產生一週課表」。</li><li>訓練當天到「今日」，按「開始訓練」，課表的項目就會變成可填寫的紀錄，上方的當日課表會自動收合。</li><li>每做完一組，填重量與次數並勾「完成」，休息倒數會自動開始。</li></ol><p class="mu sm">不排課表也可以用：直接在「今日」最下面的「新增項目」加入當天做的動作。</p>`,1)}
   ${sec('計畫：產生一週課表',`<ul><li><b>目標</b>：選你的運動或訓練目的，會決定動作、組數、次數與休息時間。</li><li><b>程度</b>：初學組數較少，進階較多。</li><li><b>器材</b>：選「居家啞鈴」或「徒手」時，只會排你做得到的動作。</li><li><b>每次可用時間</b>：填分鐘數，課表會依時間增減；留空則用系統建議的長度。</li><li><b>重量訓練日</b>：點選星期，可選 2 到 5 天。不確定就按「套用建議」。</li><li><b>專項練習日</b>：點選打球或下水的日子，排課時會避免前一天練重腿。</li><li>每堂課包含暖身、動作清單、收操與預估時間。點「怎麼做・示意圖」可看做法、肌群圖與教學連結。</li><li>改了任何設定後，要再按一次「重新產生課表」才會套用。</li></ul>`)}
   ${sec('計畫：新增自己的運動目標',`<ul><li>在目標下方點「找不到你的運動？新增自訂目標」。</li><li>輸入運動名稱，再選最接近的訓練類型，例如網球選「橫移揮拍型」。</li><li>新增後會自動選取，按「產生一週課表」即可。選到自訂目標時，下方會出現刪除按鈕。</li></ul>`)}
   ${sec('今日：記錄訓練',`<ul><li>最上方可用箭頭或日期欄切換日期，補記前幾天的訓練。</li><li>每個項目的每一組都有重量、次數兩格和「完成」勾選，輸入後自動儲存。</li><li>「＋ 加一組」會複製上一組的重量與次數。組右邊的 × 是刪除那一組，項目右上角的 × 是移除整個項目。</li><li>項目名稱下方會顯示同一個動作上次的成績，方便決定這次的重量。</li><li>「新增項目」可從動作庫選，或自己輸入名稱，例如「排球練習 90 分鐘」。</li><li>最下面的「備註」可記當天狀況。</li></ul>`)}
   ${sec('今日：太累或時間不夠',`<ul><li><b>今天比較累：用輕量版開始</b>：動作不變，每項少一組。重量請降到平常的八成左右。已經開始訓練也可以中途按「改成輕量版」。</li><li><b>依時間精簡後開始</b>：在「今天只有幾分鐘？」填入分鐘數再按，會優先保留主要動作。只影響當天，不會改課表。</li><li>如果是關節痛、頭暈或生病，請直接休息。</li></ul>`)}
+  ${sec('今日：換一份臨時課表、取消訓練',`<ul><li><b>另排一份臨時課表</b>：還沒開始訓練時，當日課表下方有這個選項。選想練的重點和要做幾個項目（2 到 8 個），系統會推薦對應數量的動作並直接開始。上面會列出原本課表的項目給你參考。</li><li>臨時課表只用在那一天，不會改掉一週課表；休息日也可以用。</li><li><b>取消這次訓練</b>：開始訓練後，「訓練紀錄」標題下方有這顆按鈕，按兩次會一次清空當天全部項目，不用一個個移除。備註會保留。</li><li>取消之後可以重新選一般版、輕量版、依時間精簡或臨時課表。</li><li>開始訓練後當日課表會收合，點課表標題可以再展開看暖身、做法與收操。</li></ul>`)}
   ${sec('今日：器材有人在用（換動作）',`<ul><li>在項目下方按「換動作」，會列出練到相同部位的替代動作。</li><li>標有「好上手」的比較容易學，適合不熟器材或狀況不好時選。</li><li>換動作只改當天的紀錄，不會改課表。</li></ul>`)}
   ${sec('今日：公斤／磅與休息計時',`<ul><li>項目下方的「公斤 kg ⇄」按一下會切換成磅，已填的重量會自動換算，再按一次換回來。每個項目可以用不同單位。</li><li>「組間休息」可選 30 到 150 秒。勾「完成」會自動開始倒數，也可以按「開始計時」手動開始。</li><li>倒數顯示在畫面下方，結束時手機會震動（需手機支援），按 × 可關閉。</li></ul>`)}
   ${sec('今日：常用紀錄',`<ul><li>填好某個項目的重量與次數後，按「存成常用」。</li><li>之後在「新增項目」最上面會看到它，點一下就把當時每一組的重量與次數帶進當天紀錄。</li><li>同一個動作再存一次會更新成最新的內容。右邊的 × 可刪除。</li></ul>`)}
   ${sec('紀錄：歷史與備份',`<ul><li>上方顯示本週、本月與累計的訓練天數。</li><li>每一天的紀錄可按「查看／編輯」回到那天修改，或按兩次「刪除」移除。</li><li><b>匯出備份檔</b>：把所有資料存成一個檔案。換手機、換瀏覽器或清除瀏覽資料前請先匯出。</li><li><b>匯入備份檔</b>：選擇之前匯出的檔案，會取代目前這台裝置上的資料。</li></ul>`)}
   ${sec('動作庫：查動作、加自己的動作與圖片',`<ul><li>可用上方搜尋欄找動作、部位或器材。點動作名稱展開，可看建議組數、肌群示意圖、做法與教學連結。</li><li>肌群示意圖中，深色是主要肌群，淺色是協同肌群。</li><li>「教學影片」與「動作圖解」會另開 YouTube 與 Google 圖片的搜尋結果。</li><li><b>加上我的圖片</b>：可放自己拍的器材或動作照片，之後在課表裡也看得到。</li><li><b>＋ 新增自訂動作</b>：填名稱並選「動作類型」。重新產生課表後，它會取代同類型的預設動作。不想排進課表就選「不排課」。</li></ul>`)}
-  ${sec('資料存在哪裡、加到主畫面、外觀',`<ul><li>所有資料只存在你這台裝置的這個瀏覽器裡，不會上傳，別人也看不到。用不同瀏覽器或不同手機開啟，資料不會同步。</li><li>加到主畫面：iPhone 用 Safari 的分享鍵選「加入主畫面」；Android 用 Chrome 選單選「加到主畫面」。</li><li>右上角的「外觀」可切換自動、淺色、深色。自動會跟著手機的夜間模式。</li><li>課表是通用的訓練原則，沒有考慮個人傷病。有舊傷或不適請自行調整，必要時詢問專業人員。</li></ul>`)}
+  ${sec('資料存在哪裡、加到主畫面、外觀',`<ul><li>所有資料只存在你這台裝置的這個瀏覽器裡，不會上傳，別人也看不到。用不同瀏覽器或不同手機開啟，資料不會同步。</li><li>全螢幕使用：先加到主畫面，再從主畫面的圖示開啟，就不會有瀏覽器的網址列。iPhone 用 Safari 的分享鍵選「加入主畫面」；Android 用 Chrome 選單選「加到主畫面」或「安裝應用程式」。</li><li>右上角的「外觀」可切換自動、淺色、深色。自動會跟著手機的夜間模式。</li><li>課表是通用的訓練原則，沒有考慮個人傷病。有舊傷或不適請自行調整，必要時詢問專業人員。</li></ul>`)}
   </div>`;
 }
 function render(){
@@ -493,7 +505,7 @@ function addItem(o){getLog().items.push(o);save();render()}
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;
   const a=b.dataset.a,v=b.dataset.v,i=+b.dataset.i,s=+b.dataset.s;
-  if(a!=='del'&&a!=='delex')delAsk=null;
+  if(a!=='del'&&a!=='delex'&&a!=='cancel')delAsk=null;
   if(a!=='swap'&&a!=='doswap')swapAt=null;
   if(a==='tab'){tab=v;render();window.scrollTo(0,0)}
   else if(a==='day'){const d=parse(cur);d.setDate(d.getDate()+ +v);cur=fmt(d);render()}
@@ -503,6 +515,14 @@ document.addEventListener('click',e=>{
     const l=getLog();l.title=p.t+(v==='fit'?'（精簡）':'');
     items.forEach(it=>l.items.push({id:it.id,name:EX[it.id].n,u:st.unit||'kg',rest:it.rest,dose:it.sets+' 組 × '+it.reps,sets:Array.from({length:it.sets},()=>({w:'',r:'',d:false}))}));
     if(v==='light')lighten(l);save();render();if(v==='fit')toast('已精簡，預估約 '+est(items)+' 分鐘')}
+  else if(a==='cancel'){if(delAsk==='cancel'){const l=st.logs[cur];l.items=[];l.title='';l.light=false;clean();delAsk=null;save()}else delAsk='cancel';render()}
+  else if(a==='adhoc'){const N=+$('#ah-n').value,b=build($('#ah-k').value,1),items=b.items;
+    for(const t of ['pre','iso','core','acc','power','main'])for(let j=items.length-1;j>=0&&items.length>N;j--)if(items[j].ty===t)items.splice(j,1);
+    for(let n=0;n<3&&items.length<N;n++)for(const it of items.slice()){if(items.length>=N)break;
+      const x=alts(it.id).find(z=>!items.some(q=>q.id===z));if(x){const ex=EX[x],ty=ex.k==='main'?'acc':ex.k;items.push(Object.assign({id:x,ty},dose(ty,ex)))}}
+    const l=getLog();l.title=b.t+'（臨時）';
+    items.forEach(it=>l.items.push({id:it.id,name:EX[it.id].n,u:st.unit||'kg',rest:it.rest,dose:it.sets+' 組 × '+it.reps,sets:Array.from({length:it.sets},()=>({w:'',r:'',d:false}))}));
+    save();render();toast('已排出 '+items.length+' 個項目，預估約 '+est(items)+' 分鐘')}
   else if(a==='unit'){const it=st.logs[cur].items[i],toLb=it.u!=='lb';it.u=toLb?'lb':'kg';st.unit=it.u;
     it.sets.forEach(x=>{const n=parseFloat(x.w);if(!isNaN(n))x.w=String(Math.round((toLb?n*2.20462:n/2.20462)*2)/2)});save();render()}
   else if(a==='fav'){const it=st.logs[cur].items[i],ss=it.sets.filter(x=>x.w||x.r).map(x=>({w:x.w,r:x.r}));
