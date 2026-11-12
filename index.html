@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#f2f4fa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e1220" media="(prefers-color-scheme: dark)">
-<meta name="apple-mobile-web-app-title" content="訓練手帳">
+<meta name="apple-mobile-web-app-title" content="幫我練一下">
 <meta name="description" content="記錄每日訓練、產生一週課表（含暖身、收操與部位銜接）的健身 web app">
 <style>
 :root{--bg:#f2f4fa;--sf:#fff;--fg:#141a2b;--mu:#586079;--ln:#d9deea;--ac:#2450e6;--acf:#fff;--soft:#e6ecff;--hi:#c81e66;--ok:#12824a;color-scheme:light}
@@ -492,7 +492,7 @@ function vHelp(){
   </div>`;
 }
 function render(){
-  $('#app').innerHTML=`<header class="top"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#2450e6"/><rect x="14" y="21.5" width="20" height="5" rx="2" fill="#fff"/><rect x="9" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="33" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="5" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><rect x="39" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><circle cx="38" cy="9" r="4" fill="#ff5c9a"/></svg><div><b>訓練手帳</b><span>排課表・記重量・看進步</span></div><button data-a="theme">${{'':'外觀：自動',light:'外觀：淺色',dark:'外觀：深色'}[st.theme||'']}</button></header>`+(tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():tab==='help'?vHelp():vLib());
+  $('#app').innerHTML=`<header class="top"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#2450e6"/><rect x="14" y="21.5" width="20" height="5" rx="2" fill="#fff"/><rect x="9" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="33" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="5" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><rect x="39" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><circle cx="38" cy="9" r="4" fill="#ff5c9a"/></svg><div><b>幫我練一下</b><span>排課表・記重量・看進步</span></div><button data-a="theme">${{'':'外觀：自動',light:'外觀：淺色',dark:'外觀：深色'}[st.theme||'']}</button></header>`+(tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():tab==='help'?vHelp():vLib());
   document.querySelectorAll('nav.tabs button').forEach(b=>b.dataset.v===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 }
 
@@ -549,7 +549,7 @@ document.addEventListener('click',e=>{
   else if(a==='gen')gen()
   else if(a==='open'){cur=v;tab='today';render();window.scrollTo(0,0)}
   else if(a==='del'){if(delAsk===v){delete st.logs[v];delAsk=null;save()}else delAsk=v;render()}
-  else if(a==='export'){const x=document.createElement('a');x.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,1)],{type:'application/json'}));x.download='訓練手帳備份-'+today()+'.json';document.body.appendChild(x);x.click();x.remove()}
+  else if(a==='export'){const x=document.createElement('a');x.href=URL.createObjectURL(new Blob([JSON.stringify(st,null,1)],{type:'application/json'}));x.download='幫我練一下備份-'+today()+'.json';document.body.appendChild(x);x.click();x.remove()}
   else if(a==='import')$('#imp').click()
   else if(a==='newex'){form={e:'gym'};render()}
   else if(a==='editex'){form=Object.assign({id:v},st.custom[v]);render();window.scrollTo(0,0)}
@@ -587,7 +587,7 @@ document.addEventListener('change',e=>{
   else if(t.id==='set-env'){st.set.env=t.value;save();render()}
   else if(t.id==='img-in'&&t.files[0]&&imgFor){const id=imgFor;readImg(t.files[0],u=>{st.imgs[id]=u;if(!save())delete st.imgs[id];render()})}
   else if(t.id==='imp'&&t.files[0]){const r=new FileReader();
-    r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d.logs!=='object'||!d.set)throw 0;st=d;sync();save();render();toast('已匯入備份')}catch(x){toast('這個檔案不是訓練手帳的備份檔')}};
+    r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||typeof d.logs!=='object'||!d.set)throw 0;st=d;sync();save();render();toast('已匯入備份')}catch(x){toast('這個檔案不是幫我練一下的備份檔')}};
     r.readAsText(t.files[0])}
 });
 render();
