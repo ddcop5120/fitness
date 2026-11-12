@@ -48,7 +48,9 @@ ol.exs li{counter-increment:e;border-top:1px solid var(--ln);padding-top:10px}
 details{border:1px dashed var(--ln);border-radius:10px;padding:8px 12px}
 details.plain{border:0;padding:0}
 summary{cursor:pointer;font-weight:700}
-details ul{margin:6px 0 0;padding-left:20px}
+details ul,details ol{margin:6px 0 0;padding-left:22px}
+.help details{background:var(--sf);border:1px solid var(--ln);border-radius:14px;padding:12px 14px}
+.help li{margin:4px 0}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chips button{border-radius:999px;min-width:44px}
 .chips button[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
@@ -86,6 +88,7 @@ nav.tabs button[aria-current=page]{color:var(--ac);background:var(--soft)}
   <button data-a="tab" data-v="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>計畫</button>
   <button data-a="tab" data-v="hist"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>紀錄</button>
   <button data-a="tab" data-v="lib"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M7 7v10M17 7v10M3 10v4M21 10v4"/></svg>動作庫</button>
+  <button data-a="tab" data-v="help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg>說明</button>
 </nav>
 
 <script>
@@ -353,7 +356,7 @@ function vToday(){
   <h1>${nice(cur)}${cur===today()?'・今天':''}</h1>`;
   if(p)h+=`<section class="card"><div class="eb">當日課表</div><h2>${p.t}</h2>${sesHTML(p)}${has?'':'<button class="pri" data-a="load">開始訓練：把這些項目加入紀錄</button><button data-a="load" data-v="light">今天比較累：用輕量版開始</button><div class="row"><input type="text" inputmode="numeric" id="today-mins" placeholder="今天只有幾分鐘？" style="flex:1" aria-label="今天可用的分鐘數"><button data-a="load" data-v="fit">依時間精簡後開始</button></div>'}</section>`;
   else if(st.plan)h+=`<section class="card"><div class="eb">當日課表</div><h2>${st.plan.ball.includes(w)?'專項練習日':'休息日'}</h2><p class="mu sm">今天沒有排重量訓練。如果有做其他運動，可以在下面自行新增紀錄。</p></section>`;
-  else h+=`<section class="card"><h2>還沒有課表</h2><p class="mu sm">到「計畫」選目標與訓練日，就會排出一週課表。也可以直接在下面記錄今天做了什麼。</p><button class="pri" data-a="tab" data-v="plan">去排課表</button></section>`;
+  else h+=`<section class="card"><h2>還沒有課表</h2><p class="mu sm">到「計畫」選目標與訓練日，就會排出一週課表。也可以直接在下面記錄今天做了什麼。</p><div class="row"><button class="pri" data-a="tab" data-v="plan">去排課表</button><button data-a="tab" data-v="help">第一次用？看使用說明</button></div></section>`;
   h+=`<h2>訓練紀錄</h2>`;
   if(has&&log.light)h+=`<section class="card"><div class="eb">輕量版</div><p class="sm">每個項目少一組，重量降到平常的八成左右，每組做完還有 3–4 下餘力就停；跳躍類求輕快、不求高度。想換成比較好上手的動作，按項目下方的「換動作」。如果是關節痛、頭暈或生病，請直接休息。</p></section>`;
   else if(has&&log.title)h+=`<div class="row"><button data-a="lighten">今天比較累：改成輕量版</button></div>`;
@@ -460,8 +463,24 @@ function readImg(file,cb){const r=new FileReader();r.onload=()=>{const im=new Im
   im.onload=()=>{const m=Math.min(1,640/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*m);c.height=Math.round(im.height*m);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.72))};
   im.onerror=()=>toast('無法讀取這張圖片');im.src=r.result};r.readAsDataURL(file)}
 
+function vHelp(){
+  const sec=(t,body,open)=>`<details ${open?'open':''}><summary>${t}</summary>${body}</details>`;
+  return `<h1>使用說明</h1><p class="mu sm">點標題可展開或收合。下方五個分頁分別是：今日（記錄訓練）、計畫（排一週課表）、紀錄（歷史與備份）、動作庫（查動作與新增自訂動作）、說明（本頁）。</p><div class="help" style="display:flex;flex-direction:column;gap:10px">
+  ${sec('快速開始：三步驟',`<ol><li>到「計畫」選目標、程度、器材，點選一週要訓練的日子，按「產生一週課表」。</li><li>訓練當天到「今日」，按「開始訓練」，課表的項目就會變成可填寫的紀錄。</li><li>每做完一組，填重量與次數並勾「完成」，休息倒數會自動開始。</li></ol><p class="mu sm">不排課表也可以用：直接在「今日」最下面的「新增項目」加入當天做的動作。</p>`,1)}
+  ${sec('計畫：產生一週課表',`<ul><li><b>目標</b>：選你的運動或訓練目的，會決定動作、組數、次數與休息時間。</li><li><b>程度</b>：初學組數較少，進階較多。</li><li><b>器材</b>：選「居家啞鈴」或「徒手」時，只會排你做得到的動作。</li><li><b>每次可用時間</b>：填分鐘數，課表會依時間增減；留空則用系統建議的長度。</li><li><b>重量訓練日</b>：點選星期，可選 2 到 5 天。不確定就按「套用建議」。</li><li><b>專項練習日</b>：點選打球或下水的日子，排課時會避免前一天練重腿。</li><li>每堂課包含暖身、動作清單、收操與預估時間。點「怎麼做・示意圖」可看做法、肌群圖與教學連結。</li><li>改了任何設定後，要再按一次「重新產生課表」才會套用。</li></ul>`)}
+  ${sec('計畫：新增自己的運動目標',`<ul><li>在目標下方點「找不到你的運動？新增自訂目標」。</li><li>輸入運動名稱，再選最接近的訓練類型，例如網球選「橫移揮拍型」。</li><li>新增後會自動選取，按「產生一週課表」即可。選到自訂目標時，下方會出現刪除按鈕。</li></ul>`)}
+  ${sec('今日：記錄訓練',`<ul><li>最上方可用箭頭或日期欄切換日期，補記前幾天的訓練。</li><li>每個項目的每一組都有重量、次數兩格和「完成」勾選，輸入後自動儲存。</li><li>「＋ 加一組」會複製上一組的重量與次數。組右邊的 × 是刪除那一組，項目右上角的 × 是移除整個項目。</li><li>項目名稱下方會顯示同一個動作上次的成績，方便決定這次的重量。</li><li>「新增項目」可從動作庫選，或自己輸入名稱，例如「排球練習 90 分鐘」。</li><li>最下面的「備註」可記當天狀況。</li></ul>`)}
+  ${sec('今日：太累或時間不夠',`<ul><li><b>今天比較累：用輕量版開始</b>：動作不變，每項少一組。重量請降到平常的八成左右。已經開始訓練也可以中途按「改成輕量版」。</li><li><b>依時間精簡後開始</b>：在「今天只有幾分鐘？」填入分鐘數再按，會優先保留主要動作。只影響當天，不會改課表。</li><li>如果是關節痛、頭暈或生病，請直接休息。</li></ul>`)}
+  ${sec('今日：器材有人在用（換動作）',`<ul><li>在項目下方按「換動作」，會列出練到相同部位的替代動作。</li><li>標有「好上手」的比較容易學，適合不熟器材或狀況不好時選。</li><li>換動作只改當天的紀錄，不會改課表。</li></ul>`)}
+  ${sec('今日：公斤／磅與休息計時',`<ul><li>項目下方的「公斤 kg ⇄」按一下會切換成磅，已填的重量會自動換算，再按一次換回來。每個項目可以用不同單位。</li><li>「組間休息」可選 30 到 150 秒。勾「完成」會自動開始倒數，也可以按「開始計時」手動開始。</li><li>倒數顯示在畫面下方，結束時手機會震動（需手機支援），按 × 可關閉。</li></ul>`)}
+  ${sec('今日：常用紀錄',`<ul><li>填好某個項目的重量與次數後，按「存成常用」。</li><li>之後在「新增項目」最上面會看到它，點一下就把當時每一組的重量與次數帶進當天紀錄。</li><li>同一個動作再存一次會更新成最新的內容。右邊的 × 可刪除。</li></ul>`)}
+  ${sec('紀錄：歷史與備份',`<ul><li>上方顯示本週、本月與累計的訓練天數。</li><li>每一天的紀錄可按「查看／編輯」回到那天修改，或按兩次「刪除」移除。</li><li><b>匯出備份檔</b>：把所有資料存成一個檔案。換手機、換瀏覽器或清除瀏覽資料前請先匯出。</li><li><b>匯入備份檔</b>：選擇之前匯出的檔案，會取代目前這台裝置上的資料。</li></ul>`)}
+  ${sec('動作庫：查動作、加自己的動作與圖片',`<ul><li>可用上方搜尋欄找動作、部位或器材。點動作名稱展開，可看建議組數、肌群示意圖、做法與教學連結。</li><li>肌群示意圖中，深色是主要肌群，淺色是協同肌群。</li><li>「教學影片」與「動作圖解」會另開 YouTube 與 Google 圖片的搜尋結果。</li><li><b>加上我的圖片</b>：可放自己拍的器材或動作照片，之後在課表裡也看得到。</li><li><b>＋ 新增自訂動作</b>：填名稱並選「動作類型」。重新產生課表後，它會取代同類型的預設動作。不想排進課表就選「不排課」。</li></ul>`)}
+  ${sec('資料存在哪裡、加到主畫面、外觀',`<ul><li>所有資料只存在你這台裝置的這個瀏覽器裡，不會上傳，別人也看不到。用不同瀏覽器或不同手機開啟，資料不會同步。</li><li>加到主畫面：iPhone 用 Safari 的分享鍵選「加入主畫面」；Android 用 Chrome 選單選「加到主畫面」。</li><li>右上角的「外觀」可切換自動、淺色、深色。自動會跟著手機的夜間模式。</li><li>課表是通用的訓練原則，沒有考慮個人傷病。有舊傷或不適請自行調整，必要時詢問專業人員。</li></ul>`)}
+  </div>`;
+}
 function render(){
-  $('#app').innerHTML=`<header class="top"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#2450e6"/><rect x="14" y="21.5" width="20" height="5" rx="2" fill="#fff"/><rect x="9" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="33" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="5" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><rect x="39" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><circle cx="38" cy="9" r="4" fill="#ff5c9a"/></svg><div><b>訓練手帳</b><span>排課表・記重量・看進步</span></div><button data-a="theme">${{'':'外觀：自動',light:'外觀：淺色',dark:'外觀：深色'}[st.theme||'']}</button></header>`+(tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():vLib());
+  $('#app').innerHTML=`<header class="top"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#2450e6"/><rect x="14" y="21.5" width="20" height="5" rx="2" fill="#fff"/><rect x="9" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="33" y="14" width="6" height="20" rx="3" fill="#fff"/><rect x="5" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><rect x="39" y="18" width="4" height="12" rx="2" fill="#ffd0e2"/><circle cx="38" cy="9" r="4" fill="#ff5c9a"/></svg><div><b>訓練手帳</b><span>排課表・記重量・看進步</span></div><button data-a="theme">${{'':'外觀：自動',light:'外觀：淺色',dark:'外觀：深色'}[st.theme||'']}</button></header>`+(tab==='today'?vToday():tab==='plan'?vPlan():tab==='hist'?vHist():tab==='help'?vHelp():vLib());
   document.querySelectorAll('nav.tabs button').forEach(b=>b.dataset.v===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
 }
 
