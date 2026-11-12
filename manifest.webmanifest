@@ -1,6 +1,6 @@
 {
- "name": "訓練手帳",
- "short_name": "訓練手帳",
+ "name": "幫我練一下",
+ "short_name": "幫我練一下",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
